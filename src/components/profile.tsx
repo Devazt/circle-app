@@ -10,9 +10,10 @@ import {
   Flex,
   CardFooter,
 } from "@chakra-ui/react";
+import IUser from "@/types/user";
 import { BiEdit } from "react-icons/bi";
 
-export default function Profile() {
+export default function Profile(props : IUser) {
   return (
     <Box>
       <Card variant={"filled"} m={4}>
@@ -30,7 +31,7 @@ export default function Profile() {
             position={"relative"}
           >
             <Image
-              src="https://bit.ly/dan-abramov"
+              src={props.profile_picture}
               boxSize={"70px"}
               rounded={"full"}
               borderWidth={4}
@@ -55,12 +56,12 @@ export default function Profile() {
             </Flex>
           </Button>
           <Text fontWeight={"bold"} fontSize={"2xl"} mt={4}>
-            ✨Stella Audhina✨
+            {props.fullname}
           </Text>
           <Text fontSize={"sm"} color={"gray.500"}>
-            @audhinafh
+            @{props.username}
           </Text>
-          <Text>picked over by the worms, and weird fishes</Text>
+          <Text>{props.profile_detail}</Text>
         </CardBody>
         <CardFooter justifyContent={"start"} gap={4} pt={0}>
           <Flex gap={2}>

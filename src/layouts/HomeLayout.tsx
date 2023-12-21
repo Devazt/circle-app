@@ -4,8 +4,21 @@ import Sidebar from "@/components/sidebar";
 import Sugestion from "@/components/sugestion";
 import Sidefooter from "@/components/sidefooter";
 import { Outlet } from "react-router-dom";
+import { useState, useEffect } from "react";
+import IUser from "@/types/user";
+import API from "@/lib/axios";
 
 const HomeLayout = () => {
+  // connect user to profile
+    // const [profile, setProfile] = useState<IUser>();
+    // const getProfile = async () => {
+    //     const res = await API.get(`/user/1`);
+    //     const json = await res.data;
+    //     setProfile(json.data);
+    // };
+    // useEffect(() => {
+    //     getProfile();
+    // }, []);
   return (
     <Flex>
       <Box w={"20%"}>
@@ -15,7 +28,9 @@ const HomeLayout = () => {
         <Outlet />
       </Box>
       <Box w={"30%"} right={0} h={"fit-content"}>
-        <Profile />
+        <Profile
+        //  {...profile}
+          />
         <Sugestion />
         <Sidefooter />
       </Box>

@@ -8,54 +8,27 @@ import {
   Avatar,
   Button,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import IUser from "@/types/user";
+import API from "@/lib/axios";
 
 export default function Sugestion() {
   const [follow, setFollow] = useState(false);
-  const sugest = [
-    {
-      id: 1,
-      avatar: "https://bit.ly/dan-abramov",
-      fullname: "Dan Abramov",
-      username: "@danabra",
-      isFollowing: false,
-    },
-    {
-      id: 2,
-      avatar: "https://bit.ly/dan-abramov",
-      fullname: "Dan Abramov",
-      username: "@danabra",
-      isFollowing: true,
-    },
-    {
-      id: 3,
-      avatar: "https://bit.ly/dan-abramov",
-      fullname: "Dan Abramov",
-      username: "@danabra",
-      isFollowing: false,
-    },
-    {
-      id: 4,
-      avatar: "https://bit.ly/dan-abramov",
-      fullname: "Dan Abramov",
-      username: "@danabra",
-      isFollowing: false,
-    },
-    {
-      id: 5,
-      avatar: "https://bit.ly/dan-abramov",
-      fullname: "Dan Abramov",
-      username: "@danabra",
-      isFollowing: true,
-    },
-    {
-      id: 6,
-      avatar: "https://bit.ly/dan-abramov",
-      fullname: "Dan Abramov",
-      username: "@danabra",
-      isFollowing: false,
-    },
-  ];
+
+  function handleFollow() {
+    setFollow(!follow);
+  }
+
+  // connect user to suggestion
+  const [suggest, setSuggest] = useState([]);
+  const getSuggest = async () => {
+    const res = await API.get(`/user`);
+    const json = await res.data;
+    setSuggest(json.data);
+  };
+  useEffect(() => {
+    getSuggest();
+  }, []);
   return (
     <Box>
       <Card variant={"filled"} m={4}>
@@ -75,24 +48,20 @@ export default function Sugestion() {
               },
             }}
           >
-            {sugest.map((item) => (
-              <Flex gap={2} key={item.id} w={"full"} my={"3"}>
-                <Avatar name={item.fullname} src={item.avatar} />
+            {suggest.map((e: IUser) => (
+              <Flex gap={2} w={"full"} my={"3"} key={e.id}>
                 <Box>
-                  <Text fontWeight={"bold"}>{item.fullname}</Text>
+                  <Avatar name={e.fullname} src={e.profile_picture} />
+                </Box>
+                <Box>
+                  <Text fontWeight={"bold"}>{e.fullname}</Text>
                   <Text fontSize={"sm"} color={"gray.500"}>
-                    {item.username}
+                    @{e.username}
                   </Text>
                 </Box>
-                {item.isFollowing == follow ? (
-                  <Button ml={"auto"} onClick={() => setFollow(false)}>
-                    Following
-                  </Button>
-                ) : (
-                  <Button ml={"auto"} onClick={() => setFollow(true)}>
-                    Follow
-                  </Button>
-                )}
+                <Button ml={"auto"} onClick={handleFollow}>
+                  {follow ? "Following" : "Follow"}
+                </Button>
               </Flex>
             ))}
           </Box>

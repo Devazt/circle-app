@@ -1,41 +1,56 @@
 [
   {
-    "id": 1,
-    "avatar": "https://i.pravatar.cc/300?u=a042581f4e29026707d",
-    "fullname": "Asal Ae",
-    "username": "@asalae",
-    "posted_at": "5 hours ago",
-    "content": "Lorem ipsum",
-    "isPicture": true,
-    "picture": "https://i.pravatar.cc/300?u=a042581f4e29026707d",
-    "like_count": 10,
-    "comment_count": 2,
-    "isLiked": true
+    "id": 3,
+    "content": "Play Arknights Now!",
+    "image": "https://static.wikia.nocookie.net/mrfz/images/5/59/Operators_introduction.jpg",
+    "posted_at": "2023-12-19T23:56:19.710Z",
+    "updated_at": "2023-12-19T23:56:19.710Z",
+    "user": {
+      "id": 3,
+      "username": "nandy",
+      "fullname": "Ren Aishi",
+      "email": "aishi@mail.com",
+      "password": "root",
+      "profile_picture": "https://bit.ly/sage-adebayo",
+      "profile_detail": "vtuber gak jadi jadi",
+      "created_at": "2023-12-19T23:17:13.782Z",
+      "updated_at": "2023-12-19T23:17:13.782Z"
+    }
   },
   {
     "id": 2,
-    "avatar": "https://i.pravatar.cc/300?u=a042581f4e29026707d",
-    "fullname": "Asal Ae",
-    "username": "@asalae",
-    "posted_at": "5 hours ago",
-    "content": "Lorem ipsum",
-    "isPicture": false,
-    "picture": "",
-    "like_count": 10,
-    "comment_count": 2,
-    "isLiked": false
+    "content": "whats on your mind",
+    "image": "",
+    "posted_at": "2023-12-19T18:31:19.405Z",
+    "updated_at": "2023-12-19T18:31:19.405Z",
+    "user": {
+      "id": 1,
+      "username": "devazt",
+      "fullname": "Nandy Septiana",
+      "email": "nandy@mail.com",
+      "password": "root",
+      "profile_picture": "https://bit.ly/dan-abramov",
+      "profile_detail": "picked over by the worms, and weird fishes",
+      "created_at": "2023-12-19T08:30:58.936Z",
+      "updated_at": "2023-12-19T08:30:58.936Z"
+    }
   },
   {
-    "id": 3,
-    "avatar": "https://i.pravatar.cc/300?u=a042581f4e29026707d",
-    "fullname": "Asal Ae",
-    "username": "@asalae",
-    "posted_at": "5 hours ago",
-    "content": "Lorem ipsum",
-    "isPicture": true,
-    "picture": "https://i.pravatar.cc/300?u=a042581f4e29026707d",
-    "like_count": 10,
-    "comment_count": 2,
-    "isLiked": true
+    "id": 1,
+    "content": "lorem ipsum test content",
+    "image": "https://static.wikia.nocookie.net/mrfz/images/9/90/IS-Lasting_Will.png/revision/latest?cb=20230526120220",
+    "posted_at": "2023-12-19T08:33:35.124Z",
+    "updated_at": "2023-12-19T08:33:35.124Z",
+    "user": {
+      "id": 1,
+      "username": "devazt",
+      "fullname": "Nandy Septiana",
+      "email": "nandy@mail.com",
+      "password": "root",
+      "profile_picture": "https://bit.ly/dan-abramov",
+      "profile_detail": "picked over by the worms, and weird fishes",
+      "created_at": "2023-12-19T08:30:58.936Z",
+      "updated_at": "2023-12-19T08:30:58.936Z"
+    }
   }
 ]
