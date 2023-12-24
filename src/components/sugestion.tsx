@@ -8,27 +8,16 @@ import {
   Avatar,
   Button,
 } from "@chakra-ui/react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import IUser from "@/types/user";
-import API from "@/lib/axios";
 
-export default function Sugestion() {
+export default function Sugestion(props: IUser) {
   const [follow, setFollow] = useState(false);
 
   function handleFollow() {
     setFollow(!follow);
   }
 
-  // connect user to suggestion
-  const [suggest, setSuggest] = useState([]);
-  const getSuggest = async () => {
-    const res = await API.get(`/user`);
-    const json = await res.data;
-    setSuggest(json.data);
-  };
-  useEffect(() => {
-    getSuggest();
-  }, []);
   return (
     <Box>
       <Card variant={"filled"} m={4}>
@@ -48,22 +37,20 @@ export default function Sugestion() {
               },
             }}
           >
-            {suggest.map((e: IUser) => (
-              <Flex gap={2} w={"full"} my={"3"} key={e.id}>
+              <Flex gap={2} w={"full"} my={"3"}>
                 <Box>
-                  <Avatar name={e.fullname} src={e.profile_picture} />
+                  <Avatar name={props.fullname} src={props.photo_profile} />
                 </Box>
                 <Box>
-                  <Text fontWeight={"bold"}>{e.fullname}</Text>
+                  <Text fontWeight={"bold"}>{props.fullname}</Text>
                   <Text fontSize={"sm"} color={"gray.500"}>
-                    @{e.username}
+                    @{props.username}
                   </Text>
                 </Box>
                 <Button ml={"auto"} onClick={handleFollow}>
                   {follow ? "Following" : "Follow"}
                 </Button>
               </Flex>
-            ))}
           </Box>
         </CardBody>
       </Card>

@@ -7,7 +7,19 @@ import {
   Button,
   useColorMode,
   Icon,
+  ModalOverlay,
+  useDisclosure,
+  Modal,
+  ModalContent,
+  ModalCloseButton,
+  ModalBody,
+  Input,
+  ModalFooter,
+  Flex,
+  Avatar,
+  Textarea,
 } from "@chakra-ui/react";
+import { useState } from "react";
 import {
   BiHomeCircle,
   BiSearchAlt,
@@ -16,9 +28,43 @@ import {
   BiLogOut,
   BiSun,
   BiMoon,
+  BiImageAdd,
 } from "react-icons/bi";
+import { useNavigate } from "react-router-dom";
 
 export default function Sidebar() {
+  const OverlayPost = () => (
+    <ModalOverlay
+      bg={"blackAlpha.300"}
+      backdropFilter={"blur(10px), hue-rotate(90deg)"}
+    />
+  );
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [overlay, setOverlay] = useState(<OverlayPost />);
+
+  const navHome = useNavigate();
+  // const navSearch = useNavigate();
+  // const navFollows = useNavigate();
+  // const navProfile = useNavigate();
+  const navLogout = useNavigate();
+
+  function handleHome() {
+    navHome("/");
+  }
+  // function handleSearch() {
+  //   navSearch("/search");
+  // }
+  // // function handleFollows() {
+  // //   navFollows("/follows");
+  // }
+  // // function handleProfile() {
+  // //   navProfile("/profile");
+  // }
+  function handleLogout() {
+    navLogout("/auth/login");
+  }
+
   const { colorMode, toggleColorMode } = useColorMode();
   return (
     <Stack h="100vh" justifyContent="space-between" p={8} position={"fixed"}>
@@ -36,30 +82,108 @@ export default function Sidebar() {
           </Heading>
         </Box>
         <List fontSize="1rem" spacing={4}>
-          <Box display={"flex"} alignItems="center">
+          <Box
+            pl={2}
+            w={"100px"}
+            _hover={{ cursor: "pointer", bg: "green.600", rounded: "full" }}
+            onClick={handleHome}
+            display={"flex"}
+            alignItems="center"
+          >
             <BiHomeCircle />
             <ListItem ms={3}>Home</ListItem>
           </Box>
-          <Box display={"flex"} alignItems="center">
+          <Box
+            pl={2}
+            w={"100px"}
+            _hover={{ cursor: "pointer", bg: "green.600", rounded: "full" }}
+            display={"flex"}
+            alignItems="center"
+          >
             <BiSearchAlt />
             <ListItem ms={3}>Search</ListItem>
           </Box>
-          <Box display={"flex"} alignItems="center">
+          <Box
+            pl={2}
+            w={"100px"}
+            _hover={{ cursor: "pointer", bg: "green.600", rounded: "full" }}
+            display={"flex"}
+            alignItems="center"
+          >
             <BiHeart />
             <ListItem ms={3}>Follows</ListItem>
           </Box>
-          <Box display={"flex"} alignItems="center">
+          <Box
+            pl={2}
+            w={"100px"}
+            _hover={{ cursor: "pointer", bg: "green.600", rounded: "full" }}
+            display={"flex"}
+            alignItems="center"
+          >
             <BiUserCircle />
             <ListItem ms={3}>Profile</ListItem>
           </Box>
         </List>
         <Stack pt="10">
-          <Button rounded="full" colorScheme="green" w="200px">
+          <Button
+            rounded="full"
+            colorScheme="green"
+            w="200px"
+            onClick={() => {
+              setOverlay(<OverlayPost />);
+              onOpen();
+            }}
+          >
             Create Post
           </Button>
+          <Modal isCentered isOpen={isOpen} onClose={onClose} size={"xl"}>
+            {overlay}
+            <ModalOverlay />
+            <ModalContent>
+              <ModalCloseButton />
+              <ModalBody>
+                <Flex mt={5}>
+                  <Box>
+                    <Avatar
+                      name="Dan Abramov"
+                      src="https://bit.ly/dan-abramov"
+                    />
+                  </Box>
+                  <Box ml={4}>
+                    <Textarea
+                      w={"400px"}
+                      placeholder="What is happening?!"
+                      variant="flushed"
+                      name="content"
+                      minH={"100px"}
+                    />
+                  </Box>
+                </Flex>
+              </ModalBody>
+              <ModalFooter>
+                    <Button justifySelf={"start"} bg={"transparent"} w={"80px"} rounded={"full"}>
+                      <Icon
+                        color={"green.500"}
+                        fontSize={"4xl"}
+                        as={BiImageAdd}
+                        ml={2}
+                      />
+                    </Button>
+                    <Button
+                      form="post"
+                      type="submit"
+                      rounded="full"
+                      colorScheme="green"
+                      w={"80px"}
+                    >
+                      Post
+                    </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
         </Stack>
       </Box>
-      <Button leftIcon={<BiLogOut />} variant="unstyled">
+      <Button onClick={handleLogout} leftIcon={<BiLogOut />} variant="unstyled">
         Logout
       </Button>
     </Stack>

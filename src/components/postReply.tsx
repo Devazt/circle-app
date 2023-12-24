@@ -8,14 +8,13 @@ export default function Reply() {
       borderX={"1px"}
       borderColor={"gray.500"}
       p={4}
-      pt={8}
     >
       <Box>
-        <Flex alignItems={"center"} gap={2} mt={4}>
+        <Flex alignItems={"center"} gap={2}>
           <Avatar name="Dan Abramov" src="https://bit.ly/dan-abramov" />
           <Input
             ml={2}
-            placeholder="What's on your mind, Stella?"
+            placeholder="Write a public reply"
             variant="flushed"
           />
           <Button bg={"transparent"} w={"80px"} rounded={"full"}>

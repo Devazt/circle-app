@@ -1,4 +1,4 @@
-import IFeed from "@/types/thread";
+import { IFeed } from "@/types/thread";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -24,22 +24,24 @@ import {
   BiRadioCircleMarked,
 } from "react-icons/bi";
 
-
-
 export default function Feed(props: IFeed) {
-  const [ like, setLike] = useState(false)
-  const navigate = useNavigate()
+  const [like, setLike] = useState(false);
+  const navigate = useNavigate();
   function handleNavigate() {
-    navigate(`/thread/${props.id}`)
+    navigate(`/thread/${props.id}`);
   }
 
   function handleLike() {
-    setLike(!like)
+    setLike(!like);
   }
   return (
-    <Box borderBottom={"1px"} borderX={"1px"} borderColor={"gray.500"} onClick={handleNavigate}>
+    <Box borderBottom={"1px"} borderX={"1px"} borderColor={"gray.500"}>
       <Flex p={4}>
-        <Avatar name={props.user.fullname} size="md" src={props.user.profile_picture} />
+        <Avatar
+          name={props.user.fullname}
+          size="md"
+          src={props.user.photo_profile}
+        />
         <Card w={"full"} variant={"unstyled"} pl={4}>
           <CardHeader>
             <Flex flex="1" gap="2" alignItems="center" flexWrap="wrap">
@@ -52,12 +54,12 @@ export default function Feed(props: IFeed) {
               <Box>
                 <Flex align={"center"}>
                   <Icon as={BiRadioCircleMarked} color={"gray.500"} />
-                  <Text color={"gray.500"}>{props.posted_at}</Text>
+                  <Text color={"gray.500"}>{props.created_at}</Text>
                 </Flex>
               </Box>
             </Flex>
           </CardHeader>
-          <CardBody py={4}>
+          <CardBody py={4} onClick={handleNavigate}>
             <Text>{props.content}</Text>
           </CardBody>
           {props.image ? (
@@ -68,6 +70,9 @@ export default function Feed(props: IFeed) {
               width={"full"}
               height={"300px"}
               alt="Chakra UI"
+              border={"1px"}
+              onClick={handleNavigate}
+              bg={"gray.200"}
             />
           ) : null}
 
@@ -94,9 +99,10 @@ export default function Feed(props: IFeed) {
               w={"50px"}
               variant="ghost"
               leftIcon={<BiChat />}
+              onClick={handleNavigate}
             >
               {/* {comment_count} */}
-               Replies
+              Replies
             </Button>
           </CardFooter>
         </Card>

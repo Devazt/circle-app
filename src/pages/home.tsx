@@ -1,8 +1,8 @@
-import Feed from "@/components/thread";
-import Post from "@/components/post";
-import IFeed from "@/types/thread";
+import Feed from "@/feature/thread/component/Feeds";
+import Post from "@/feature/thread/component/post";
+import { IFeed } from "@/types/thread";
 import { useEffect, useState } from "react";
-import API from "@/lib/axios";
+import { API } from "@/lib/api";
 
 export default function Home() {
   const [feed, setFeed] = useState([]);

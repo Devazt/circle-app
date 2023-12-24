@@ -5,20 +5,37 @@ import Sugestion from "@/components/sugestion";
 import Sidefooter from "@/components/sidefooter";
 import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
-import IUser from "@/types/user";
-import API from "@/lib/axios";
+import { IUser } from "@/types/user";
+import { API } from "@/lib/api";
 
 const HomeLayout = () => {
   // connect user to profile
-    // const [profile, setProfile] = useState<IUser>();
-    // const getProfile = async () => {
-    //     const res = await API.get(`/user/1`);
-    //     const json = await res.data;
-    //     setProfile(json.data);
-    // };
-    // useEffect(() => {
-    //     getProfile();
-    // }, []);
+    const [profile, setProfile] = useState<IUser>();
+    const getProfile = async () => {
+        const res = await API.get(`/user`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.token}`,
+            },
+        });
+        const json = await res.data;
+        console.log(res.data)
+        setProfile(json.data);
+    };
+    useEffect(() => {
+        getProfile();
+    }, []);
+
+  // connect user to sugestion
+    const [sugestion, setSugestion] = useState<IUser[]>();
+    const getSugestion = async () => {
+        const res = await API.get(`/user`);
+        const json = await res.data;
+        setSugestion(json.data);
+    };
+    useEffect(() => {
+        getSugestion();
+    }, []);
+
   return (
     <Flex>
       <Box w={"20%"}>
@@ -28,10 +45,12 @@ const HomeLayout = () => {
         <Outlet />
       </Box>
       <Box w={"30%"} right={0} h={"fit-content"}>
-        <Profile
-        //  {...profile}
-          />
-        <Sugestion />
+        {profile != undefined && <Profile {...profile} />}
+        {sugestion != undefined && sugestion.map((s: IUser) => {
+          return (
+            <Sugestion key={s.id} {...s} />
+          );
+        })}
         <Sidefooter />
       </Box>
     </Flex>

@@ -1,11 +1,30 @@
-export default interface IUser {
+export interface IUser {
     id: number;
     username: string;
     fullname: string;
     email: string;
     password: string;
-    profile_picture: string;
-    profile_detail: string;
+    photo_profile: string;
+    bio: string;
     created_at: string;
     updated_at: string;
+}
+
+export type IUserAuth = {
+    id?: number
+    fullname?: string
+    username?: string
+    email?: string
+}
+
+export type IUserRegister = {
+    username: string
+    fullname: string
+    email: string
+    password: string
+}
+
+export type IUserLogin = {
+    email: string
+    password: string
 }

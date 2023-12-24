@@ -10,7 +10,7 @@ import {
   Flex,
   CardFooter,
 } from "@chakra-ui/react";
-import IUser from "@/types/user";
+import { IUser } from "@/types/user";
 import { BiEdit } from "react-icons/bi";
 
 export default function Profile(props : IUser) {
@@ -31,7 +31,7 @@ export default function Profile(props : IUser) {
             position={"relative"}
           >
             <Image
-              src={props.profile_picture}
+              src={props.photo_profile}
               boxSize={"70px"}
               rounded={"full"}
               borderWidth={4}
@@ -61,7 +61,7 @@ export default function Profile(props : IUser) {
           <Text fontSize={"sm"} color={"gray.500"}>
             @{props.username}
           </Text>
-          <Text>{props.profile_detail}</Text>
+          <Text>{props.photo_profile}</Text>
         </CardBody>
         <CardFooter justifyContent={"start"} gap={4} pt={0}>
           <Flex gap={2}>
