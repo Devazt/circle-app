@@ -13,10 +13,14 @@
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@fontsource-variable/montserrat": "^5.0.17",
+    "@fontsource/paytone-one": "^5.0.18",
+    "@fontsource/righteous": "^5.0.18",
     "@reduxjs/toolkit": "^2.0.1",
     "@tanstack/react-query": "^5.14.2",
     "axios": "^1.6.2",
     "framer-motion": "^10.16.16",
+    "jsonwebtoken": "^9.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.12.0",
@@ -24,6 +28,7 @@
     "react-router-dom": "^6.21.0"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.5",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
     "@typescript-eslint/eslint-plugin": "^6.14.0",

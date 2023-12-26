@@ -1,26 +1,29 @@
-import React, { FormEvent } from "react"
-import { API } from "@/lib/api"
-import { IThread } from "@/types/thread"
-import { useQuery } from "@tanstack/react-query"
+import React, { FormEvent } from "react";
+import { API } from "@/lib/api";
+import { IKomen } from "@/types/reply";
+import { useQuery } from "@tanstack/react-query";
+import { useParams } from "react-router-dom";
 
-export function useThread() {
+export function useReply() {
 
-    const [form, setForm] = React.useState<IThread>({
+    const [form, setForm] = React.useState<IKomen>({
         content: "",
         image: "",
+        thread: 0
     });
 
-    async function getThreads() {
+    async function getReply() {
         try {
-            const response = await API.get(`/thread`);
-            const json = await response.data;
-            return json.data;
+            // const param = useParams();
+            const response = await API.get(`/reply/1`);
+            // const json = await response.data;
+            return response.data
         } catch (error) {
             throw new Error
         }
     }
 
-    const { data: thread, refetch, isLoading } = useQuery({ queryKey: ['thread' ], queryFn: getThreads })
+    const { data: reply, refetch } = useQuery({ queryKey: ['reply'], queryFn: getReply })
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
         const { name, value, files } = e.target
@@ -51,19 +54,18 @@ export function useThread() {
 
         formData.append("content", form.content)
         formData.append("image", form.image as File)
+        formData.append("thread", `${useParams().id}`)
 
-        API.post("/thread", formData)
+        API.post("/reply", formData)
         refetch()
     }
 
     return {
-        isLoading,
         form,
-        thread,
+        reply,
         handleChange,
-        fileInputRef,
         handleClickButton,
         handleSubmit,
-        refetch
+        fileInputRef
     }
 }

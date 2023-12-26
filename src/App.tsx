@@ -12,6 +12,7 @@ import { API, setAuthToken } from "./lib/api";
 import { useDispatch } from "react-redux";
 import { AUTH_CHECK, AUTH_ERROR } from "./store/rootReducer";
 import { Text } from "@chakra-ui/react";
+import FormProfile from "./feature/profile/component/FormProfile";
 
 export default function App() {
   const dispatch = useDispatch();
@@ -38,7 +39,6 @@ export default function App() {
   }, []);
 
   function IsLogin() {
-    console.log(auth.username, "ini login");
     if (!auth.username) {
       return <Navigate to="/auth/login" />;
     }
@@ -47,7 +47,6 @@ export default function App() {
   }
 
   function IsNotLogin() {
-    console.log(auth.username, "ini notlogin");
     if (auth.username) {
       return <Navigate to="/" />;
     }
@@ -63,7 +62,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomeLayout />}>
             <Route index element={<Home />} />
-            <Route path="/details/:id" element={<Details />} />
+            <Route path="/thread/:id" element={<Details />} />
+            <Route path="/profile/edit" element={<FormProfile />} />
           </Route>
           <Route path="/auth" element={<AuthPage />}>
             <Route index element={<Login />} />
@@ -71,10 +71,10 @@ export default function App() {
             <Route path="register" element={<Register />} />
           </Route>
           <Route element={<IsLogin />}>
-            <Route path="/*" element={<HomeLayout />} />
+            <Route path="/" element={<HomeLayout />} />
           </Route>
           <Route element={<IsNotLogin />}>
-            <Route path="/*" element={<HomeLayout />} />
+            <Route path="/auth" element={<AuthPage />} />
           </Route>
         </Routes>
       )}

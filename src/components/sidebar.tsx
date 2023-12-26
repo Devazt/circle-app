@@ -13,13 +13,12 @@ import {
   ModalContent,
   ModalCloseButton,
   ModalBody,
-  Input,
   ModalFooter,
   Flex,
   Avatar,
-  Textarea,
+  FormControl,
+  Input,
 } from "@chakra-ui/react";
-import { useState } from "react";
 import {
   BiHomeCircle,
   BiSearchAlt,
@@ -31,15 +30,18 @@ import {
   BiImageAdd,
 } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
+import { useThread } from "@/feature/thread/hook/useThread";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { AUTH_LOGOUT } from "@/store/rootReducer";
 
 export default function Sidebar() {
   const OverlayPost = () => (
     <ModalOverlay
       bg={"blackAlpha.300"}
-      backdropFilter={"blur(10px), hue-rotate(90deg)"}
+      backdropFilter={"blur(20px), hue-rotate(90deg)"}
     />
   );
-
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [overlay, setOverlay] = useState(<OverlayPost />);
 
@@ -61,16 +63,36 @@ export default function Sidebar() {
   // // function handleProfile() {
   // //   navProfile("/profile");
   // }
+
+  const dispatch = useDispatch();
   function handleLogout() {
+    dispatch(AUTH_LOGOUT());
     navLogout("/auth/login");
   }
 
   const { colorMode, toggleColorMode } = useColorMode();
+
+  const { handleChange, handleClickButton, handleSubmit, fileInputRef } =
+    useThread();
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  function handleImagePreview(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        setImagePreview(reader.result as string);
+      };
+    } else {
+      setImagePreview(null);
+    }
+  }
+
   return (
     <Stack h="100vh" justifyContent="space-between" p={8} position={"fixed"}>
       <Box>
         <Box>
-          <Heading size={"2xl"} color={"green.400"} pb={8}>
+          <Heading size={"3xl"} color={"green.400"} pb={8}>
             Circle
             <Button
               onClick={toggleColorMode}
@@ -141,27 +163,60 @@ export default function Sidebar() {
             <ModalOverlay />
             <ModalContent>
               <ModalCloseButton />
-              <ModalBody>
-                <Flex mt={5}>
-                  <Box>
-                    <Avatar
-                      name="Dan Abramov"
-                      src="https://bit.ly/dan-abramov"
+              <FormControl>
+                <form onSubmit={handleSubmit}>
+                  <ModalBody>
+                    <Flex mt={5}>
+                      <Box>
+                        <Avatar
+                          name="Dan Abramov"
+                          src="https://bit.ly/dan-abramov"
+                        />
+                      </Box>
+                      <Box ml={4}>
+                        <Input
+                          w={"400px"}
+                          placeholder="What is happening?!"
+                          variant="flushed"
+                          name="content"
+                          minH={"50px"}
+                          onChange={handleChange}
+                        />
+                      </Box>
+                    </Flex>
+                    {imagePreview && (
+                      <Box
+                        w={"full"}
+                        h={"300px"}
+                        bgImage={imagePreview}
+                        bgPosition={"center"}
+                        bgRepeat={"no-repeat"}
+                        bgSize={"cover"}
+                        mt={4}
+                        borderRadius={"10"}
+                        border={"1px"}
+                        borderColor={"gray.500"}
+                      />
+                    )}
+                  </ModalBody>
+                  <ModalFooter>
+                    <Input
+                      display={"none"}
+                      type="file"
+                      name="image"
+                      ref={fileInputRef}
+                      onChange={(e) => {
+                        handleChange(e);
+                        handleImagePreview(e);
+                      }}
                     />
-                  </Box>
-                  <Box ml={4}>
-                    <Textarea
-                      w={"400px"}
-                      placeholder="What is happening?!"
-                      variant="flushed"
-                      name="content"
-                      minH={"100px"}
-                    />
-                  </Box>
-                </Flex>
-              </ModalBody>
-              <ModalFooter>
-                    <Button justifySelf={"start"} bg={"transparent"} w={"80px"} rounded={"full"}>
+                    <Button
+                      type="button"
+                      bg={"transparent"}
+                      w={"80px"}
+                      rounded={"full"}
+                      onClick={handleClickButton}
+                    >
                       <Icon
                         color={"green.500"}
                         fontSize={"4xl"}
@@ -170,7 +225,6 @@ export default function Sidebar() {
                       />
                     </Button>
                     <Button
-                      form="post"
                       type="submit"
                       rounded="full"
                       colorScheme="green"
@@ -178,7 +232,9 @@ export default function Sidebar() {
                     >
                       Post
                     </Button>
-              </ModalFooter>
+                  </ModalFooter>
+                </form>
+              </FormControl>
             </ModalContent>
           </Modal>
         </Stack>

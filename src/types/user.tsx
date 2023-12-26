@@ -10,6 +10,21 @@ export interface IUser {
     updated_at: string;
 }
 
+export type IProfile = {
+    id: number
+    username: string
+    fullname: string
+    photo_profile: string
+    bio: string
+}
+
+export type ISuggest = {
+    id: number
+    username: string
+    fullname: string
+    photo_profile: string
+}
+
 export type IUserAuth = {
     id?: number
     fullname?: string
