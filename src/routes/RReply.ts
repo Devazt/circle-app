@@ -5,8 +5,10 @@ import upload from "../middlewares/multer/multer"
 
 const RReply = express.Router()
 
-RReply.get("/reply/:id", CReply.find)
-RReply.post("/reply", AuthTokenMiddleware.Authentication, upload.single("image"), CReply.create)
-RReply.delete("/reply/:id", AuthTokenMiddleware.Authentication, CReply.delete)
+RReply.get("/replies", CReply.find);
+RReply.get("/reply/:id", CReply.findOne);
+RReply.post("/replies", AuthTokenMiddleware.Authentication, upload.Upload("image"), CReply.create);
+RReply.patch("/reply/:id", CReply.update);
+RReply.delete("/reply/:id", CReply.delete);
 
 export default RReply

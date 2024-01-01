@@ -7,7 +7,7 @@ export const AppDataSource = new DataSource({
     port: 5432,
     username: "postgres",
     password: "root",
-    database: "circle-app",
+    database: "circle-db",
     synchronize: true,
     logging: false,
     entities: ["src/entities/*.ts"],

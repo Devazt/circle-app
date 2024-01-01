@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { User } from "./User";
 import { Reply } from "./Reply";
 import { Like } from "./Like";
@@ -9,19 +9,22 @@ export class Thread {
     @PrimaryGeneratedColumn()
     id: number
 
-    @Column()
+    @Column({nullable: true})
     content: string
 
     @Column({nullable: true})
     image: string
 
-    @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
+    @CreateDateColumn({ type: "timestamp"})
     created_at: Date
 
-    @UpdateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)", onUpdate: "CURRENT_TIMESTAMP(6)" })
+    @UpdateDateColumn({ type: "timestamp"})
     updated_at: Date
 
-    @ManyToOne(() => User, user => user.threads)
+    @ManyToOne(() => User, user => user.threads, {
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE"
+    })
     user: User
 
     @OneToMany(() => Reply, reply => reply.thread)

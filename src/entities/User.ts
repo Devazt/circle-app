@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from "typeorm"
-import { Follow } from "./Follow";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToMany, JoinTable } from "typeorm"
 import { Thread } from "./Thread";
 import { Reply } from "./Reply";
 import { Like } from "./Like";
@@ -28,17 +27,28 @@ export class User {
     @Column({ nullable: true })
     bio: string;
 
-    @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
+    @CreateDateColumn({ type: "timestamp"})
     created_at: Date
 
-    @UpdateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)", onUpdate: "CURRENT_TIMESTAMP(6)" })
+    @UpdateDateColumn({ type: "timestamp"})
     updated_at: Date
 
-    @OneToMany(() => Follow, follower => follower.user)
-    follower: Follow[];
+    @ManyToMany(() => User, (user) => user.following)
+    @JoinTable({
+        name: "follower",
+        joinColumn: {
+            name: "follower",
+            referencedColumnName: "id"
+        },
+        inverseJoinColumn: {
+            name: "following",
+            referencedColumnName: "id"
+        }
+    })
+    follower: User[]
 
-    @OneToMany(() => Follow, following => following.user)
-    following: Follow[];
+    @ManyToMany(() => User, (user) => user.follower)
+    following: User[]
 
     @OneToMany(() => Thread, threads => threads.user)
     threads: Thread[];

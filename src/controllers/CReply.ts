@@ -10,6 +10,14 @@ export default new class CReply {
         SReply.create(req, res);
     }
 
+    update(req: Request, res: Response) {
+        SReply.update(req, res);
+    }
+
+    findOne(req: Request, res: Response) {
+        SReply.findOne(req, res);
+    }
+
     delete(req: Request, res: Response) {
         SReply.delete(req, res);
     }

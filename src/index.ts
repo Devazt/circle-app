@@ -4,6 +4,7 @@ import cors from "cors";
 import { AppDataSource } from "./data-source";
 import dotenv from "dotenv";
 import router from "./routes";
+import { redisConnect } from "./utils/caching-redis/redis";
 
 dotenv.config();
 
@@ -11,6 +12,7 @@ AppDataSource.initialize()
     .then(async () => {
         const app = express();
         const port = 5000;
+        redisConnect();
 
         const corsOptions = {
             "origin": "*",

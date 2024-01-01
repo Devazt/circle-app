@@ -2,88 +2,176 @@ import { Repository } from "typeorm";
 import { Reply } from "../entities/Reply";
 import { AppDataSource } from "../data-source";
 import { Request, Response } from "express";
-import cloudinary from "../middlewares/cloudinary/cloudinary";
-import { promisify } from "util";
-import fs from "fs"
-
-const unlinkAsync = promisify(fs.unlink);
+import { v2 as cloudinary } from "cloudinary";
+import { CrRepSchema, UpRepSchema } from "../utils/validation/VReply";
+import dotenv from "dotenv"
+dotenv.config();
 
 export default new class SReply {
     private readonly ReplyRepo: Repository<Reply> = AppDataSource.getRepository(Reply)
 
     async find(req: Request, res: Response): Promise<Response> {
         try{
-            const replies = await this.ReplyRepo.find({where: {thread: {id: Number(req.params.id)}}, relations: ["user", "thread"], order: {created_at: "DESC"}});
+            const reply = await this.ReplyRepo.find({
+                relations: ["user", "thread"],
+                order: {
+                    created_at: "DESC"
+                }
+            })
+
             return res.status(200).json({
-                message: "Success",
-                data: replies
-            })
-        } catch (error) {
-            return res.status(500).json({
-                error: error.message
-            })
-        }
-    }
-
-    async create(req: Request, res: Response): Promise<Response> {
-        try{
-            const data = req.body;
-            const userId = res.locals.loginSession.user.id;
-            const username = res.locals.loginSession.user.username;
-
-            if (req.file){
-                const cloud = await cloudinary.uploader.upload(req.file.path, {
-                    folder: `circle/user/${userId}-${username}/reply`,
-                    tags: "circle,user,reply"
-                });
-                data.image = cloud.secure_url;
-                await unlinkAsync(req.file.path);
-            }
-
-            const result = this.ReplyRepo.create({
-                content: data.content,
-                image: data.image,
-                user: userId
-            })
-
-            const reply = await this.ReplyRepo.save(result);            
-            return res.status(201).json({
                 message: "Success",
                 data: reply
             })
 
         } catch (error) {
             return res.status(500).json({
-                error: error.message})
+                error: "Error while finding replies",
+                message: error
+            })
         }
     }
 
-    async delete(req: Request, res: Response) {
-        try{
-            const id = req.params.id
-            const userId = res.locals.loginSession.user.id;
+    async create(req: Request, res: Response): Promise<Response> {
+        try {
+            cloudinary.config({
+                cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+                api_key: process.env.CLOUDINARY_API_KEY,
+                api_secret: process.env.CLOUDINARY_API_SECRET,
+                secure: true,
+            });
 
-            const checkData = await this.ReplyRepo.findOneBy({id: Number(id)});
-            if (!checkData)
-                return res.status(404).json({
-                    message: "Reply not found"
+            let image
+            if (res.locals.filename) {
+                const cloud = await cloudinary.uploader.upload(
+                    "src/uploads" + image,
+                    {
+                        folder: `circle/user/${res.locals.loginSession.user.id}-${res.locals.loginSession.user.username}/thread`,
+                        tags: "circle,user,thread"
+                    }
+                )
+                image = cloud.secure_url
+            }
+
+            const loginSession = res.locals.loginSession
+
+            const data: any = {
+                content: req.body.content,
+                image: image,
+                thread: Number(req.body.thread)
+            }
+
+            const { error, value } = CrRepSchema.validate(data)
+            if (error) {
+                return res.status(400).json({
+                    error: error.details[0].message
                 })
+            }
 
-            const checkUser = await this.ReplyRepo.findOne({where: {id: Number(id)}, relations: ["user"]});
-            if (checkUser.user.id !== userId)
-                return res.status(404).json({
-                    message: "User not allowed to delete this reply"
-                })
+            const replies = this.ReplyRepo.create({
+                content: value.content,
+                image: value.image,
+                thread: {
+                    id: value.thread
+                },
+                user: {
+                    id: loginSession.user.id
+                }
+            })
 
-            const result = await this.ReplyRepo.delete({id: Number(id)});
-            return res.status(200).json({
+            const result = await this.ReplyRepo.save(replies)
+            return res.status(201).json({
                 message: "Success",
                 data: result
             })
+
         } catch (error) {
             return res.status(500).json({
-                error: error
+                error: "Error while creating reply",
+                message: error
             })
         }
     }
-}   
+
+    async findOne(req: Request, res: Response): Promise<Response> {
+        try {
+            const id = Number(req.params.id)
+            const thread = await this.ReplyRepo.findOne({
+                where: {id: id},
+                relations: ["user", "thread", "replies.user"]
+            })
+            return res.status(200).json({
+                message: "Success",
+                data: thread
+            })
+        } catch (error) {
+            return res.status(500).json({
+                error: "Error while finding reply",
+                message: error
+            })
+        }
+    }
+
+    async update( req: Request, res: Response): Promise<Response> {
+        try {
+            const id = Number(req.params.id)
+            const replies = await this.ReplyRepo.findOne({
+                where: {id: id}
+            })
+
+            if(!replies)
+                return res.status(404).json({
+                error: "Reply not found"
+            })
+            
+            const data = req.body;
+            const { error, value } = UpRepSchema.validate(data)
+            if (error) {
+                return res.status(400).json({ error: error.details[0].message })
+            }
+
+            if(value.content != "") replies.content = value.content;
+            if(value.image != "") replies.image = value.image;
+
+            const update = await this.ReplyRepo.save(replies)
+            return res.status(200).json({
+                message: "Success",
+                data: update
+            })
+
+        } catch (error) {
+            return res.status(500).json({
+                error: "Error while updating reply",
+                message: error
+            })
+        }
+    }
+
+    async delete(req: Request, res: Response): Promise<Response> {
+        try {
+            const id = Number(req.params.id)
+            const reply = await this.ReplyRepo.findOne({
+                where: {id: id}
+            })
+
+            if(!reply)
+                return res.status(404).json({
+                error: "Reply not found"
+            })
+
+            const response = await this.ReplyRepo.delete({
+                id: id
+            });
+            return res.status(200).json({
+                message: "Success",
+                data: response
+            })
+
+        } catch (error) {
+            return res.status(500).json({
+                error: "Error while deleting reply",
+                message: error
+            })
+        }
+    }
+}

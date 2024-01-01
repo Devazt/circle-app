@@ -7,15 +7,21 @@ export class Like {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
+    @CreateDateColumn({ type: "timestamp"})
     created_at: Date
 
-    @UpdateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)", onUpdate: "CURRENT_TIMESTAMP(6)" })
+    @UpdateDateColumn({ type: "timestamp"})
     updated_at: Date
 
-    @ManyToOne(() => User, user => user.likes)
+    @ManyToOne(() => User, user => user.likes, {
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE"
+    })
     user: User
 
-    @ManyToOne(() => Thread, thread => thread.likes)
+    @ManyToOne(() => Thread, thread => thread.likes, {
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE"
+    })
     thread: Thread
 }

@@ -1,15 +1,33 @@
+import { Request, Response, NextFunction } from "express";
 import multer from "multer";
-import path from "path";
 
-const storage = multer.diskStorage({
-    filename: function (req, file, cb) {
-        cb(null, `${Date.now()}-${file.originalname}`);
-    },
-    destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, "../../uploads"));
+export default new class UploadFile {
+    Upload(fieldName: string) {
+        const storage = multer.diskStorage({
+            destination: (req, file, cb) => {
+                cb(null, "src/uploads");
+            },
+            filename: (req, file, cb) => {
+                cb(null, `${Date.now()}-${file.fieldname}.png`);
+            },
+        });
+
+        const uploadFile = multer({
+            storage: storage
+        });
+
+        return (req: Request, res: Response, next: NextFunction) => {
+            uploadFile.single(fieldName)(req, res, function (err: any) {
+                if (err) {
+                    return res.status(400).json({
+                        Error: `${err}`,
+                    })
+                }
+                if (req.file) {
+                    res.locals.filename = req.file.filename;
+                }
+                next();
+            });
+        }
     }
-});
-
-const upload = multer({ storage: storage });
-
-export default upload
+}

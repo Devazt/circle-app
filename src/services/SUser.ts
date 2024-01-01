@@ -2,42 +2,90 @@ import { Repository } from "typeorm";
 import { User } from "../entities/User";
 import { AppDataSource } from "../data-source";
 import { Request, Response } from "express";
-import { CrUserLoginSchema, CrUserRegSchema } from "../utils/VAuth";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import { CrUserSchema, UpUserSchema } from "../utils/validation/VUser";
+import bcrypt, { hash } from "bcrypt";
 import dotenv from "dotenv"
+import { DEFAULT_EXPIRATION, ReidsClient } from "../utils/caching-redis/redis";
 
 dotenv.config();
 
 export default new class SUser {
     private readonly UserRepo: Repository<User> = AppDataSource.getRepository(User)
 
-    async register(req: Request, res: Response): Promise<Response> {
+    async find(req: Request, res: Response): Promise<Response> {
         try {
-            const data = req.body
+            const users = await this.UserRepo.find({
+                relations: ["following", "follower"]
+            });
 
-            const { error } = CrUserRegSchema.validate(data);
-            if (error) {
-                return res.status(400).json({
-                    error: error.details[0].message
-                })
-            }
-
-            const emailCheck = await this.UserRepo.findOneBy({email: data.email})
-            if (emailCheck) {
-                return res.status(400).json({message: "Email already exists"})
-            }
-            
-            const hashPassword = await bcrypt.hash(data.password, 10);
-
-            const newUser = this.UserRepo.create({
-                username: data.username,
-                fullname: data.fullname,
-                email: data.email,
-                password: hashPassword
+            return res.status(200).json({
+                users
             })
+
+        } catch (error) {
+            return res
+                .status(500)
+                .json({ error: "Error while fetching users" });
+        }
+    }
+
+    async findOne(req: Request, res: Response): Promise<Response> {
+        try {
+            const loginSession = res.locals.loginSession;
+
+            if (!loginSession) {
+                return res
+                  .status(401)
+                  .json({ error: "You are not logged in" });
+            }
+
+            const redisKey = loginSession.user.id.toString();
+            // console.log(redisKey)
+            const RedisCache = await ReidsClient.get(redisKey);
+
+            if (RedisCache) {
+                return res
+                .status(200)
+                .json({ data: JSON.parse(RedisCache), from: "cache"});
+            } else {
+                const user = await this.UserRepo.findOne({
+                    where: {
+                        id: loginSession.user.id
+                    },
+                    relations: ["following", "follower", "threads"]
+                });
+
+                ReidsClient.setEx(redisKey, DEFAULT_EXPIRATION, JSON.stringify(user));
+
+                return res.status(200).json({ data: user, from: "query"});
+            }
             
-            const result = await this.UserRepo.save(newUser)
+        } catch (error) {
+            return res
+                .status(500)
+                .json({ error: "Error while fetching user", message: error.message});
+        }
+    }
+
+    async create( req: Request, res: Response): Promise<Response> {
+        try {
+            const data = req.body;
+
+            const { error, value } = CrUserSchema.validate(data);
+            if (error) {
+                return res.status(400).json({ error: error.details[0].message })
+            }
+
+            const users = this.UserRepo.create({
+                email: value.email,
+                fullname: value.fullname,
+                username: value.username,
+                password: value.password,
+                photo_profile: value.photo_profile,
+                bio: value.bio
+            });
+
+            const result = await this.UserRepo.save(users);
             return res.status(201).json({
                 message: "User created successfully",
                 user: result
@@ -45,101 +93,149 @@ export default new class SUser {
 
         } catch (error) {
             return res.status(500).json({
-                error: error.message
+                error: "Error while creating user"
             })
         }
     }
 
-    async login(req: Request, res: Response): Promise<Response> {
+    async update(req: Request, res: Response): Promise<Response> {
         try {
-            const data = req.body;
-
-            const { error } = CrUserLoginSchema.validate(data);
-            if (error) {
-                return res.status(400).json({
-                    error: error.details[0].message
-                })
-            }
-
-            const userCheck = await this.UserRepo.findOneBy({ email: data.email })
-            if (!userCheck) {
-                return res.status(400).json({
-                    error: "Email not found"
-                })
-            }
-
-            const checkPassword = await bcrypt.compare(data.password, userCheck.password)
-            if (!checkPassword) {
-                return res.status(400).json({
-                    error: "Wrong password"
-                })
-            }
-            
-            const user = this.UserRepo.create({
-                id: userCheck.id,
-                fullname: userCheck.fullname,
-                username: userCheck.username,
-                email: userCheck.email
+            const id = Number(req.params.id)
+            const user = await this.UserRepo.findOne({
+                where: {id: id}
             });
+            const data = req.body;
+            const { error, value } = UpUserSchema.validate(data);
 
-            const token = jwt.sign(
-                {user},
-                process.env.JWT_SECRET,
-                {expiresIn : "1h"} )
-            
+            if (error) {
+                return res.status(400).json({ error: error.details[0].message })
+            }
+
+            if (value.password) {
+                const hashPassword = await bcrypt.hash(value.password, 10);
+                user.password = hashPassword;
+            }
+
+            user.email = value.email
+            user.fullname = value.fullname
+            user.username = value.username
+            user.photo_profile = value.photo_profile
+            user.bio = value.bio
+
+            const update = await this.UserRepo.save(user);
             return res.status(200).json({
-                message: "Login success",
-                token: token
+                message: "User updated successfully",
+                user: update
             })
 
         } catch (error) {
             return res.status(500).json({
-                error: error
+                error: "Error while updating user"
             })
         }
     }
 
-    async find(req: Request, res: Response): Promise<Response> {
+    async updateByJWT(req: Request, res: Response): Promise<Response> {
         try {
-            const users = await this.UserRepo.find();
+            const loginSession = res.locals.loginSession;
+            const user = await this.UserRepo.findOne({
+                where: { id: loginSession.user.id}
+            });
+            const data = req.body;
+            const { error, value } = UpUserSchema.validate(data);
+
+            if (error) {
+                return res.status(400).json({ error: error.details[0].message })
+            }
+
+            if (value.password) {
+                const hashPassword = await bcrypt.hash(value.password, 10);
+                user.password = hashPassword;
+            }
+
+            user.email = value.email;
+            user.fullname = value.fullname;
+            user.username = value.username;
+            user.photo_profile = value.photo_profile;
+            user.bio = value.bio;
+
+            const update = await this.UserRepo.save( user );
+            ReidsClient.del(loginSession.user.id.toString());
             return res.status(200).json({
-                users
+                message: "User updated successfully",
+                user: update
             })
         } catch (error) {
             return res.status(500).json({
-                error: error
+                error: "Error while updating user"
             })
         }
     }
 
-    async findOne(req: Request, res: Response): Promise<Response> {
+    async delete(req: Request, res: Response): Promise<Response> {
         try {
-            const user = await this.UserRepo.findOneBy({ id: Number(req.params.id) });
+            const id = Number(req.params.id);
+            const thread = await this.UserRepo.findOne({
+                where: {id: id}
+            })
+
+            if(!thread) return res.status(404).json({ Error: "User not found" });
+
+            const response = await this.UserRepo.delete({
+                id: id
+            })
             return res.status(200).json({
-                user
+                message: "User deleted successfully",
+                response
             })
         } catch (error) {
             return res.status(500).json({
-                error: error
+                error: "Error while deleting user"
             })
         }
     }
 
-    async check(req: Request, res: Response): Promise<Response> {
+    async follow( req: Request, res: Response): Promise<Response> {
         try {
-            const loginSession = res.locals.loginSession
+            const loginSession = res.locals.loginSession;
+            const followingId = Number(req.body.following);
 
-            const user = await this.UserRepo.findOne({ 
-                where: {id: loginSession.user.id}
+            const follower = await this.UserRepo.findOne({
+                where: {
+                    id: loginSession.user.id
+                },
+                relations: ["following"]
             })
+
+            const following = await this.UserRepo.findOne({
+                where: {
+                    id: followingId
+                }
+            })
+
+            if (!follower || !following) {
+                return res.status(404).json({ error: "User not found" });
+            }
+
+            const isFollowing = follower.following.filter(
+                (user) => user.id !== following.id
+            );
+            if (isFollowing) {
+                follower.following = follower.following.filter(
+                (user) => user.id !== following.id
+                )
+            } else {
+                follower.following.push(following)
+            }
+
+            await this.UserRepo.save(follower);
+            ReidsClient.del(loginSession.user.id.toString());
             return res.status(200).json({
-                message: "Authorized",
-                user: user
+                message: "User followed successfully"
             })
-
-        } catch (error) {
-            return res.status(500).json({
-                error: error.message
+            } catch (error) {
+                return res.status(500).json({
+                    error: "Error while following/unfollowing user"
             })
         }
     }

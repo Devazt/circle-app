@@ -7,21 +7,27 @@ export class Reply {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({nullable: true})
     content: string;
 
     @Column({nullable: true})
     image: string;
 
-    @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
+    @CreateDateColumn({ type: "timestamp"})
     created_at: Date;
 
-    @UpdateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)", onUpdate: "CURRENT_TIMESTAMP(6)" })
+    @UpdateDateColumn({ type: "timestamp"})
     updated_at: Date;
 
-    @ManyToOne(() => User, user => user.replies)
+    @ManyToOne(() => User, user => user.replies, {
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE"
+    })
     user: User;
 
-    @ManyToOne(() => Thread, thread => thread.replies)
+    @ManyToOne(() => Thread, thread => thread.replies, {
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE"
+    })
     thread: Thread;
 }
