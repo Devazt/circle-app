@@ -1,7 +1,8 @@
 import React from "react";
 import { API } from "@/lib/api";
 import { useNavigate } from "react-router-dom";
-import { IUserRegister } from "@/types/user";
+import { IUserRegister } from "@/types/UserProps";
+import useToast from "@/hooks/useToast";
 
 export function useRegister () {
     const navigate = useNavigate();
@@ -20,9 +21,13 @@ export function useRegister () {
         });
     }
 
+    const toast = useToast();
+
     async function handleRegister() {
         try {
-            await API.post("/auth/register", form);
+            const response = await API.post("/auth/register", form);
+            
+            if (response) toast("Account Created", "Register successfully", "success");
             navigate("/auth/login");
         } catch (error) {
             throw error

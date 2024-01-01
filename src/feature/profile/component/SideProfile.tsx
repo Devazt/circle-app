@@ -9,11 +9,19 @@ import {
   Icon,
   Flex,
   CardFooter,
+  Spinner,
 } from "@chakra-ui/react";
-import { IUser } from "@/types/user";
 import { BiEdit } from "react-icons/bi";
+import { useNavigate } from "react-router-dom";
+import { useSideProfile } from "../hook/useSideProfile";
 
-export default function Profile(props : IUser) {
+export default function SideProfile() {
+  const navigate = useNavigate();
+
+  const { profile, isLoading } = useSideProfile();
+
+  if (isLoading) return <Spinner />;
+
   return (
     <Box>
       <Card variant={"filled"} m={4}>
@@ -31,7 +39,7 @@ export default function Profile(props : IUser) {
             position={"relative"}
           >
             <Image
-              src={props.photo_profile}
+              src={profile.photo_profile}
               boxSize={"70px"}
               rounded={"full"}
               borderWidth={4}
@@ -50,26 +58,27 @@ export default function Profile(props : IUser) {
             mt={2}
             border={"1px"}
             borderColor={"gray.500"}
+            onClick={() => navigate("/profile")}
           >
             <Flex alignItems={"center"} gap={2}>
               <Icon as={BiEdit} /> Edit Profile
             </Flex>
           </Button>
           <Text fontWeight={"bold"} fontSize={"2xl"} mt={4}>
-            {props.fullname}
+            {profile.fullname}
           </Text>
           <Text fontSize={"sm"} color={"gray.500"}>
-            @{props.username}
+            @{profile.username}
           </Text>
-          <Text>{props.photo_profile}</Text>
+          <Text>{profile.bio}</Text>
         </CardBody>
         <CardFooter justifyContent={"start"} gap={4} pt={0}>
           <Flex gap={2}>
-            <Text fontWeight={"bold"}>291</Text>
+            <Text fontWeight={"bold"}>{profile.following.length}</Text>
             <Text color={"gray.500"}>Following</Text>
           </Flex>
           <Flex gap={2}>
-            <Text fontWeight={"bold"}>23</Text>
+            <Text fontWeight={"bold"}>{profile.follower.length}</Text>
             <Text color={"gray.500"}>Followers</Text>
           </Flex>
         </CardFooter>

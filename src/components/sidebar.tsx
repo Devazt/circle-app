@@ -11,13 +11,13 @@ import {
   useDisclosure,
   Modal,
   ModalContent,
-  ModalCloseButton,
   ModalBody,
   ModalFooter,
   Flex,
   Avatar,
   FormControl,
   Input,
+  Image,
 } from "@chakra-ui/react";
 import {
   BiHomeCircle,
@@ -29,11 +29,13 @@ import {
   BiMoon,
   BiImageAdd,
 } from "react-icons/bi";
-import { useNavigate } from "react-router-dom";
-import { useThread } from "@/feature/thread/hook/useThread";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { AUTH_LOGOUT } from "@/store/rootReducer";
+import { useThreadCreate } from "@/feature/thread/hook/useThreadCreate";
+import { useFollowing } from "@/feature/follow/hook/useFollowing";
+import useToast from "@/hooks/useToast";
 
 export default function Sidebar() {
   const OverlayPost = () => (
@@ -44,49 +46,29 @@ export default function Sidebar() {
   );
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [overlay, setOverlay] = useState(<OverlayPost />);
-
-  const navHome = useNavigate();
-  // const navSearch = useNavigate();
-  // const navFollows = useNavigate();
-  // const navProfile = useNavigate();
-  const navLogout = useNavigate();
-
-  function handleHome() {
-    navHome("/");
-  }
-  // function handleSearch() {
-  //   navSearch("/search");
-  // }
-  // // function handleFollows() {
-  // //   navFollows("/follows");
-  // }
-  // // function handleProfile() {
-  // //   navProfile("/profile");
-  // }
-
+  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const toast = useToast();
   function handleLogout() {
     dispatch(AUTH_LOGOUT());
-    navLogout("/auth/login");
+    toast("Logout", "You have been logged out", "info");
   }
+  
 
   const { colorMode, toggleColorMode } = useColorMode();
 
-  const { handleChange, handleClickButton, handleSubmit, fileInputRef } =
-    useThread();
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  function handleImagePreview(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        setImagePreview(reader.result as string);
-      };
-    } else {
-      setImagePreview(null);
-    }
-  }
+  const {
+    handleChange,
+    mutate,
+    isPending,
+    handleClickButton,
+    fileInputRef,
+    form,
+    file,
+    setFile,
+  } = useThreadCreate();
+
+  const { userFollow: userProfileData } = useFollowing();
 
   return (
     <Stack h="100vh" justifyContent="space-between" p={8} position={"fixed"}>
@@ -108,12 +90,13 @@ export default function Sidebar() {
             pl={2}
             w={"100px"}
             _hover={{ cursor: "pointer", bg: "green.600", rounded: "full" }}
-            onClick={handleHome}
             display={"flex"}
             alignItems="center"
           >
             <BiHomeCircle />
+            <NavLink to="/">
             <ListItem ms={3}>Home</ListItem>
+            </NavLink>
           </Box>
           <Box
             pl={2}
@@ -123,7 +106,9 @@ export default function Sidebar() {
             alignItems="center"
           >
             <BiSearchAlt />
+            <NavLink to="/search">
             <ListItem ms={3}>Search</ListItem>
+            </NavLink>
           </Box>
           <Box
             pl={2}
@@ -133,7 +118,9 @@ export default function Sidebar() {
             alignItems="center"
           >
             <BiHeart />
+            <NavLink to ="/follows">
             <ListItem ms={3}>Follows</ListItem>
+            </NavLink>
           </Box>
           <Box
             pl={2}
@@ -143,7 +130,9 @@ export default function Sidebar() {
             alignItems="center"
           >
             <BiUserCircle />
+            <NavLink to="/profile">
             <ListItem ms={3}>Profile</ListItem>
+            </NavLink>
           </Box>
         </List>
         <Stack pt="10">
@@ -162,15 +151,20 @@ export default function Sidebar() {
             {overlay}
             <ModalOverlay />
             <ModalContent>
-              <ModalCloseButton />
               <FormControl>
-                <form onSubmit={handleSubmit}>
+                <form
+                  encType="multipart/form-data"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    mutate();
+                  }}
+                >
                   <ModalBody>
                     <Flex mt={5}>
                       <Box>
                         <Avatar
                           name="Dan Abramov"
-                          src="https://bit.ly/dan-abramov"
+                          src={userProfileData?.photo_profile}
                         />
                       </Box>
                       <Box ml={4}>
@@ -181,22 +175,27 @@ export default function Sidebar() {
                           name="content"
                           minH={"50px"}
                           onChange={handleChange}
+                          value={form.content}
                         />
                       </Box>
                     </Flex>
-                    {imagePreview && (
-                      <Box
-                        w={"full"}
-                        h={"300px"}
-                        bgImage={imagePreview}
-                        bgPosition={"center"}
-                        bgRepeat={"no-repeat"}
-                        bgSize={"cover"}
-                        mt={4}
-                        borderRadius={"10"}
-                        border={"1px"}
-                        borderColor={"gray.500"}
-                      />
+                    {file && (
+                      <Box display="flex" justifyContent="center">
+                        <Image
+                          mt="20px"
+                          h="200px"
+                          w="auto"
+                          objectFit="cover"
+                          rounded="md"
+                          src={URL.createObjectURL(file)}
+                        />
+                        <Button
+                          variant="unstyled"
+                          onClick={() => setFile(null)}
+                        >
+                          x
+                        </Button>
+                      </Box>
                     )}
                   </ModalBody>
                   <ModalFooter>
@@ -204,11 +203,10 @@ export default function Sidebar() {
                       display={"none"}
                       type="file"
                       name="image"
+                      id="image"
+                      accept="image/*"
                       ref={fileInputRef}
-                      onChange={(e) => {
-                        handleChange(e);
-                        handleImagePreview(e);
-                      }}
+                      onChange={handleChange}
                     />
                     <Button
                       type="button"
@@ -226,9 +224,15 @@ export default function Sidebar() {
                     </Button>
                     <Button
                       type="submit"
+                      isLoading={isPending}
                       rounded="full"
                       colorScheme="green"
                       w={"80px"}
+                      onClick={() =>
+                        setTimeout(() => {
+                          setFile(null);
+                        }, 1000)
+                      }
                     >
                       Post
                     </Button>
@@ -239,7 +243,14 @@ export default function Sidebar() {
           </Modal>
         </Stack>
       </Box>
-      <Button onClick={handleLogout} leftIcon={<BiLogOut />} variant="unstyled">
+      <Button
+        onClick={() => {
+          handleLogout();
+          navigate("/auth/login");
+        }}
+        leftIcon={<BiLogOut />}
+        variant="unstyled"
+      >
         Logout
       </Button>
     </Stack>

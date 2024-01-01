@@ -1,39 +1,11 @@
 import { Box, Card, CardBody, CardHeader, Flex, Text } from "@chakra-ui/react";
-import Profile from "@/feature/profile/component/ProfileCard";
+import SideProfile from "@/feature/profile/component/SideProfile";
 import Sidebar from "@/components/sidebar";
-import Sugestion from "@/components/sugestion";
+import Sugestion from "@/feature/suggestion/component/sugestion";
 import Sidefooter from "@/components/sidefooter";
 import { Outlet } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { IUser } from "@/types/user";
-import { API, setAuthToken } from "@/lib/api";
 
 const HomeLayout = () => {
-
-  // connect user to profile
-  const [profile, setProfile] = useState<IUser>();
-  const getProfile = async () => {
-    setAuthToken(localStorage.token);
-    const response = await API.get("/auth/check");
-    const res = await API.get(`/user/` + response.data.user.id);
-    const json = await res.data;
-    setProfile(json.user);
-  };
-
-  useEffect(() => {
-    getProfile();
-  }, []);
-
-  // connect user to sugestion
-  const [sugestion, setSugestion] = useState<IUser[]>();
-  const getSugestion = async () => {
-    const res = await API.get(`/user`);
-    const json = await res.data;
-    setSugestion(json.users);
-  };
-  useEffect(() => {
-    getSugestion();
-  }, []);
 
   return (
     <Flex>
@@ -44,19 +16,25 @@ const HomeLayout = () => {
         <Outlet />
       </Box>
       <Box w={"30%"} right={0} h={"fit-content"}>
-        {profile != undefined && <Profile {...profile} />}
+        <SideProfile />
         <Box>
-          <Card variant={"filled"} m={4}>
-            <CardHeader pb={0}>
+          <Card variant={"filled"} m={4} pb={4}>
+            <CardHeader pb={2}>
               <Text fontSize={"xl"} fontWeight={"bold"}>
                 Suggested for you
               </Text>
             </CardHeader>
-            <CardBody pt={2} overflow={"hidden"}>
-              {sugestion != undefined &&
-                sugestion.map((s: IUser) => {
-                  return <Sugestion key={s.id} {...s} />;
-                })}
+            <CardBody
+              maxH={"300px"}
+              overflowY={"scroll"}
+              pr={2}
+              sx={{
+                "::-webkit-scrollbar": {
+                  display: "none",
+                },
+              }}
+            >
+            <Sugestion />
             </CardBody>
           </Card>
         </Box>

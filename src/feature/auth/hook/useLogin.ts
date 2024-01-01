@@ -1,13 +1,15 @@
 import React from "react";
 import { API } from "@/lib/api";
 import { useNavigate } from "react-router-dom";
-import { IUserLogin } from "@/types/user";
+import { IUserLogin } from "@/types/UserProps";
 import { useDispatch } from "react-redux";
-import { AUTH_LOGIN } from "@/store/rootReducer";
+import { AUTH_LOGIN, AUTH_CHECK } from "@/store/rootReducer";
+import useToast from "@/hooks/useToast";
 
 export function useLogin () {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const toast = useToast();
 
     const [form, setForm] = React.useState<IUserLogin>({
         email: "",
@@ -24,8 +26,11 @@ export function useLogin () {
     async function handleLogin() {
         try {
             const response = await API.post("/auth/login", form);
+            dispatch(AUTH_LOGIN(response?.data))
+            dispatch(AUTH_CHECK(response?.data.user))
 
-            dispatch(AUTH_LOGIN(response.data))
+            if (response) toast("Success", "Login successfully", "success");
+
             navigate("/");
         } catch (error) {
             throw error

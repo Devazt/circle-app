@@ -1,4 +1,4 @@
-import IReply from "@/types/reply";
+import IReply from "@/types/RepliesProps";
 import { Box, Flex, Avatar, Text } from "@chakra-ui/react";
 
 export default function ReplyList(props: IReply) {

@@ -1,28 +1,19 @@
 import Feed from "@/feature/thread/component/Feeds";
-import { useState } from "react";
-import { useThread } from "@/feature/thread/hook/useThread";
-import { Avatar, Box, Button, Flex, FormControl, Heading, Icon, Input, Text} from "@chakra-ui/react";
+import { useThreadCreate } from "@/feature/thread/hook/useThreadCreate";
+import { Avatar, Box, Button, Flex, FormControl, Heading, Icon, Image, Input, Spinner,} from "@chakra-ui/react";
 import { BiImageAdd } from "react-icons/bi";
+import { useThread } from "@/feature/thread/hook/useThread";
+import { useFollowing } from "@/feature/follow/hook/useFollowing";
+import { IThreadPost } from "@/types/ThreadProps";
 
 export default function Home() {
-  const { handleChange, handleClickButton, handleSubmit, fileInputRef, thread, isLoading, refetch } =
-    useThread();
+  const { feed, isLoading } = useThread();
+  const { handleChange, mutate, isPending, handleClickButton, fileInputRef, form, file, setFile } =
+    useThreadCreate();
+  const { userFollow: userProfileData } = useFollowing();
 
-  const [ imagePreview, setImagePreview ] = useState<string | null>(null);
+  if ( isLoading ) return <Spinner />
 
-  function handleImagePreview(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        setImagePreview(reader.result as string);
-      };
-    } else {
-      setImagePreview(null);
-    }
-  }
-  
   return (
     <>
       <Box
@@ -36,25 +27,31 @@ export default function Home() {
           Home
         </Heading>
         <FormControl>
-          <form onSubmit={handleSubmit}>
+          <form 
+            encType="multipart/form-data"
+            onSubmit={(e) => {
+              e.preventDefault();
+              mutate();
+            }}
+          >
             <Flex alignItems={"center"} gap={2} mt={4}>
-              <Avatar name="Dan Abramov" src="https://bit.ly/dan-abramov" />
+              <Avatar name="Dan Abrahmov" src={userProfileData?.photo_profile} />
               <Input
                 ml={2}
                 placeholder="What's on your mind?"
                 variant="flushed"
                 name="content"
                 onChange={handleChange}
+                value={form.content}
               />
               <Input
                 display={"none"}
                 type="file"
                 name="image"
+                id="image"
+                accept="image/*"
                 ref={fileInputRef}
-                onChange={(e) => {
-                  handleChange(e);
-                  handleImagePreview(e);
-                }}
+                onChange={handleChange}
               />
               <Button
                 type="button"
@@ -72,46 +69,52 @@ export default function Home() {
               </Button>
               <Button
                 type="submit"
+                isLoading={isPending}
                 rounded="full"
                 colorScheme="green"
                 w={"80px"}
+                onClick={() =>
+                  setTimeout(() => {
+                    setFile(null);
+                  }, 1000)}
               >
                 Post
               </Button>
             </Flex>
           </form>
         </FormControl>
-        {imagePreview && (
-          <Box
-            w={"full"}
-            h={"300px"}
-            bgImage={imagePreview}
-            bgPosition={"center"}
-            bgRepeat={"no-repeat"}
-            bgSize={"cover"}
-            mt={4}
-            borderRadius={"10"}
-            border={"1px"}
-            borderColor={"gray.500"}
+        {file && (
+        <Box display="flex" justifyContent="center">
+          <Image
+            mt="20px"
+            h="200px"
+            w="auto"
+            objectFit="cover"
+            rounded="md"
+            src={URL.createObjectURL(file)}
           />
-        )}
+          <Button variant="unstyled" onClick={() => setFile(null)}>
+            x
+          </Button>
+        </Box>
+      )}
       </Box>
-        {isLoading && 
-        <>
-        <Text>Loading...</Text>
-        <Button onClick={() => refetch()}>Refresh</Button>
-        </>
-        }
-        {thread && thread.map((data: any) => (
+        {feed?.map((thread: IThreadPost) => thread.user ? (
           <Feed 
-          key={data.id}
-          id={data.id}
-          content={data.content}
-          image={data.image}
-          created_at={data.created_at}
-          user={data.user}
+          key={thread.id}
+          id={thread.id}
+          username={thread.user.username}
+          fullname={thread.user.fullname}
+          photo_profile={thread.user.photo_profile}
+          content={thread.content}
+          image={thread.image}
+          created_at={thread.created_at}
+          likes={thread.likes}
+          likeCount={thread.likeCount}
+          replies={thread.replyCount}
           />
-        ))}
+        ) : null
+        )}
     </>
   );
 }

@@ -1,6 +1,6 @@
 import React, { FormEvent } from "react";
 import { API } from "@/lib/api";
-import { IKomen } from "@/types/reply";
+import { IKomen } from "@/types/RepliesProps";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 

@@ -1,19 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 import { API } from "@/lib/api";
 
-export function useThread() {
+export function useProfileCard() {
   const {
-    data: feed,
+    data: profile,
     isLoading,
     error,
     refetch,
   } = useQuery({
-    queryKey: ["feed"],
+    queryKey: ["profile-card"],
     queryFn: async () => {
-      const res = await API.get("/thread");
-      return res.data;
+      const res = await API.get("/user");
+      return res.data.data;
     },
   });
   refetch();
-  return { feed, isLoading, error, refetch };
+  return { profile, isLoading, error };
 }

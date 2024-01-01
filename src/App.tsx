@@ -1,7 +1,7 @@
 import { Navigate, Outlet, Route, Routes, useNavigate } from "react-router-dom";
-import Home from "@/pages/home";
+import Home from "./pages/Home";
 import HomeLayout from "@/layouts/HomeLayout";
-import Details from "@/pages/statusDetails";
+import Details from "@/pages/Status";
 import AuthPage from "@/layouts/AuthLayout";
 import Login from "@/feature/auth/component/FormLogin";
 import Register from "@/feature/auth/component/FormRegister";
@@ -12,7 +12,9 @@ import { API, setAuthToken } from "./lib/api";
 import { useDispatch } from "react-redux";
 import { AUTH_CHECK, AUTH_ERROR } from "./store/rootReducer";
 import { Text } from "@chakra-ui/react";
-import FormProfile from "./feature/profile/component/FormProfile";
+import Search from "./feature/search/component/Search";
+import Profile from "./pages/Profile";
+import Follows from "./pages/Follows";
 
 export default function App() {
   const dispatch = useDispatch();
@@ -24,8 +26,7 @@ export default function App() {
     try {
       setAuthToken(localStorage.token);
       const response = await API.get("/auth/check");
-
-      dispatch(AUTH_CHECK(response.data));
+      dispatch(AUTH_CHECK(response.data.user))
       setIsLoading(false);
     } catch (error) {
       dispatch(AUTH_ERROR());
@@ -63,7 +64,9 @@ export default function App() {
           <Route path="/" element={<HomeLayout />}>
             <Route index element={<Home />} />
             <Route path="/thread/:id" element={<Details />} />
-            <Route path="/profile/edit" element={<FormProfile />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/follows" element={<Follows />} />
           </Route>
           <Route path="/auth" element={<AuthPage />}>
             <Route index element={<Login />} />

@@ -1,46 +1,101 @@
-import { Box, Button, FormControl, Input, Text } from "@chakra-ui/react";
-import { BiArrowBack } from "react-icons/bi";
-import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { useUpdateProfile } from "../hook/useUpdateProfile";
+import { Box, Button, Image, Input, Stack } from "@chakra-ui/react";
+import FormRow from "@/components/FormRow";
 
-export default function FormProfile() {
-    const navigate = useNavigate();
-    function handleNavigate() {
-        navigate(`/`);
-    }
+export default function FormProfile({
+  photo_profile,
+  username,
+  fullname,
+  bio,
+}: any) {
+  const { register, handleSubmit, formState, reset } = useForm();
+  const { errors } = formState;
+
+  const { form, setForm, updateUser, isUpdating } = useUpdateProfile();
+
+  function onSubmit({ username, fullname, bio }: any) {
+    setForm({ ...form, username, fullname, bio });
+    updateUser();
+  }
+
   return (
-    <Box 
-    p={5}
-    m={4}>
-      <Button
-        onClick={handleNavigate}
-        colorScheme={"green"}
-        rounded={"full"}
+    <Stack w={"full"} alignItems={"center"}>
+      <Box
+        w="400px"
+        display={"flex"}
+        flexDirection="column"
+        bgColor="gray.700"
+        rounded="xl"
+        px="5"
+        py="9"
       >
-        <BiArrowBack size={20} /> Edit Profile
-      </Button>
-      <FormControl>
-        <form>
-          <Box mt={4}>
-            <Text>Photo Profile</Text>
-            <Box
-              w={"200px"}
-              h={"200px"}
-              bgImage={"https://bit.ly/dan-abramov"}
-              bgPosition={"center"}
-              bgRepeat={"no-repeat"}
-              bgSize={"cover"}
-              borderRadius={"10"}
-              border={"1px"}
-              borderColor={"gray.500"}
+        <Box display="flex" justifyContent="center">
+          <Image
+            h="140px"
+            w="auto"
+            objectFit="cover"
+            rounded="full"
+            src={photo_profile}
+            border="4px"
+            borderColor="green.400"
+          />
+        </Box>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <FormRow
+            label="Fullname"
+            error={errors?.fullname?.message?.toString()}
+          >
+            <Input
+              defaultValue={fullname}
+              type="text"
+              isDisabled={isUpdating}
+              id="fullname"
+              {...register("fullname", {
+                required: "This field is required",
+              })}
             />
+          </FormRow>
+          <FormRow
+            label="Username"
+            error={errors?.username?.message?.toString()}
+          >
+            <Input
+              defaultValue={username}
+              type="text"
+              id="username"
+              isDisabled={isUpdating}
+              {...register("username", {
+                required: "This field is required",
+              })}
+            />
+          </FormRow>
+          <FormRow label="Bio" error={errors?.bio?.message?.toString()}>
+            <Input
+              defaultValue={bio}
+              type="text"
+              id="bio"
+              isDisabled={isUpdating}
+              {...register("bio", {
+                required: "This field is required",
+              })}
+            />
+          </FormRow>
+          <Box
+            mt="20px"
+            display="flex"
+            justifyContent="space-between"
+            maxW="11rem"
+          >
+            <Button onClick={reset} type="reset">
+              Cancel
+            </Button>
+            <Button type="submit" isLoading={isUpdating} colorScheme="green">
+              Submit
+            </Button>
           </Box>
-          <Input placeholder="Full Name" />
-          <Input placeholder="Email" />
-          <Input placeholder="Password" />
-          <Input placeholder="Confirm Password" />
-          <Button type="submit">Submit</Button>
         </form>
-      </FormControl>
-    </Box>
+      </Box>
+    </Stack>
   );
 }

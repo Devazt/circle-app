@@ -1,2 +1,2 @@
 export * from './FormProfile'
-export * from './ProfileCard'
+export * from './SideProfile'

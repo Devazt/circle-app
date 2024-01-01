@@ -1,4 +1,3 @@
-import { IFeed } from "@/types/thread";
 import {
   Avatar,
   Box,
@@ -11,20 +10,32 @@ import {
   Heading,
   Button,
   Image,
+  Spinner,
 } from "@chakra-ui/react";
 import { BiArrowBack, BiRadioCircleMarked } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
+import { useStatusReply } from "../hook/useStatusReply";
 
-export default function ThreadDetails(props: IFeed) {
+export default function StatusReply() {
   const navigate = useNavigate();
-  function handleNavigate() {
-    navigate(`/`);
-  }
+  const { reply, isLoading } = useStatusReply();
 
+  if (isLoading) return <Spinner />;
+
+ let created = new Date(reply.created_at);
+  const formatdate = created.toLocaleString("id-ID", {
+    weekday: "long",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+  });
   return (
     <Box borderBottom={"1px"} borderX={"1px"} borderColor={"gray.500"}>
       <Button
-        onClick={handleNavigate}
+        onClick={() => navigate(-1)}
         colorScheme={"green"}
         rounded={"full"}
         p={5}
@@ -35,37 +46,36 @@ export default function ThreadDetails(props: IFeed) {
       </Button>
       <Flex p={4}>
         <Avatar
-          name={props.user.fullname}
+          name={reply.user.fullname}
           size="md"
-          src={props.user.photo_profile}
+          src={reply.user.photo_profile}
         />
         <Card w={"full"} variant={"unstyled"} pl={4}>
           <CardHeader>
             <Flex flex="1" gap="2" alignItems="center" flexWrap="wrap">
               <Box>
-                <Heading size="sm">{props.user.fullname}</Heading>
+                <Heading size="sm">{reply.user.fullname}</Heading>
               </Box>
               <Box>
-                <Text color={"gray.500"}>@{props.user.username}</Text>
+                <Text color={"gray.500"}>@{reply.user.username}</Text>
               </Box>
               <Box>
                 <Flex align={"center"}>
                   <Icon as={BiRadioCircleMarked} color={"gray.500"} />
-                  <Text color={"gray.500"}>{props.created_at}</Text>
+                  <Text color={"gray.500"}>{formatdate}</Text>
                 </Flex>
               </Box>
             </Flex>
           </CardHeader>
           <CardBody py={4}>
-            <Text>{props.content}</Text>
+            <Text>{reply.content}</Text>
           </CardBody>
-          {props.image ?
+          {reply.image ?
           <Image
             borderRadius={20}
             objectFit="cover"
-            src={props.image}
-            width={"full"}
-            height={"300px"}
+            src={reply.image}
+            height={"full"}
             alt="Chakra UI"
             border={"1px"}
             bg={"gray.200"}
