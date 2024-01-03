@@ -43,11 +43,13 @@ export default new class SReply {
 
             let image
             if (res.locals.filename) {
+                image = res.locals.filename;
+
                 const cloud = await cloudinary.uploader.upload(
-                    "src/uploads" + image,
+                    "src/uploads/" + image,
                     {
-                        folder: `circle/user/${res.locals.loginSession.user.id}-${res.locals.loginSession.user.username}/thread`,
-                        tags: "circle,user,thread"
+                        folder: `circle/user/${res.locals.loginSession.user.id}-${res.locals.loginSession.user.username}/reply`,
+                        tags: "circle,user,reply"
                     }
                 )
                 image = cloud.secure_url
@@ -70,7 +72,7 @@ export default new class SReply {
 
             const replies = this.ReplyRepo.create({
                 content: value.content,
-                image: value.image,
+                image: image,
                 thread: {
                     id: value.thread
                 },
@@ -84,6 +86,7 @@ export default new class SReply {
                 message: "Success",
                 data: result
             })
+            console.log(result)
 
         } catch (error) {
             return res.status(500).json({

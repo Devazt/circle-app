@@ -40,7 +40,6 @@ export default new class SUser {
             }
 
             const redisKey = loginSession.user.id.toString();
-            // console.log(redisKey)
             const RedisCache = await ReidsClient.get(redisKey);
 
             if (RedisCache) {
@@ -217,8 +216,8 @@ export default new class SUser {
                 return res.status(404).json({ error: "User not found" });
             }
 
-            const isFollowing = follower.following.filter(
-                (user) => user.id !== following.id
+            const isFollowing = follower.following.some(
+                (user) => user.id === following.id
             );
             if (isFollowing) {
                 follower.following = follower.following.filter(
@@ -231,7 +230,9 @@ export default new class SUser {
             await this.UserRepo.save(follower);
             ReidsClient.del(loginSession.user.id.toString());
             return res.status(200).json({
-                message: "User followed successfully"
+                message: isFollowing ? "Unfollowed" : "Followed",
+                user: follower.fullname,
+                following: following.fullname
             })
             } catch (error) {
                 return res.status(500).json({
