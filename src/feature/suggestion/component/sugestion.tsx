@@ -21,7 +21,14 @@ export default function Sugestion() {
 
   return (
     <Card bg="whiteAlpha.200" p={4} minW="380px">
-      <Box overflowY="auto" h="15rem">  
+      <Box
+      h="15rem"
+      overflowY={"scroll"}
+      css={{
+        '&::-webkit-scrollbar': {
+        display: 'none',
+        }}}
+      >  
         {list.map((user: any) => (
           <SugestFollow
             user={user.id}

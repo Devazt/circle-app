@@ -149,7 +149,7 @@ export default function Feed({
               w={"50px"}
               variant="ghost"
               leftIcon={<BiChat />}
-              onClick={handleClick}
+              onClick={() => navigate(`/thread/${id}`)}
             >
               {replies}
               &nbsp;

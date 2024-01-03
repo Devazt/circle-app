@@ -10,7 +10,12 @@ import {
   Icon,
   Image,
   Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalOverlay,
   Text,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { BiImageAdd } from "react-icons/bi";
 
@@ -32,6 +37,8 @@ export default function ReplyForm({ threadReply }: RepliesForm) {
     setFile,
   } = useFormReply();
 
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   return (
     <Box>
       {threadReply.replies.map((reply: IReply) => (
@@ -50,7 +57,12 @@ export default function ReplyForm({ threadReply }: RepliesForm) {
               />
             </Box>
             <Box w={"full"}>
-              <Flex gap={2} alignItems={"center"} borderBottom={"1px"} borderColor={"gray.500"}>
+              <Flex
+                gap={2}
+                alignItems={"center"}
+                borderBottom={"1px"}
+                borderColor={"gray.500"}
+              >
                 <Box>
                   <Heading size="sm">{reply.user.fullname}</Heading>
                 </Box>
@@ -59,6 +71,19 @@ export default function ReplyForm({ threadReply }: RepliesForm) {
                 </Box>
               </Flex>
               <Text minH={"30px"}>{reply.content}</Text>
+              {reply.image ? (
+                  <>
+                  <Image src={reply.image} h={"300px"} onClick={onOpen}/>
+                  <Modal isCentered isOpen={isOpen} onClose={onClose} size={"5xl"} variant={"unstyled"}>
+                    <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(20px)" />
+                    <ModalContent>
+                      <ModalBody>
+                        <Image src={reply.image}/>
+                      </ModalBody>
+                    </ModalContent>
+                  </Modal>
+                  </>
+              ) : null}
             </Box>
           </Flex>
         </Box>

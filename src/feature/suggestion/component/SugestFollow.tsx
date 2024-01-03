@@ -31,7 +31,6 @@ export default function SugestFollow({
       queryClient.invalidateQueries({ queryKey: ["users"] });
       queryClient.invalidateQueries({ queryKey: ["following"] });
       queryClient.invalidateQueries({ queryKey: ["user-profile"] });
-      toast("Success", "User Followed", "success");
     },
     onError: (err) => {
       console.error(err);
@@ -43,7 +42,6 @@ export default function SugestFollow({
     setFollow({ following: user });
     handleFollow();
   }
-
   if (isLoading) return <Spinner />;
 
   const { following } = userFollow;
