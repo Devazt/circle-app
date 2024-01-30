@@ -1,5 +1,5 @@
 import { Box, Tab, TabIndicator, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
-import Following from './following'
+import Following from './Following'
 import Follower from './Follower'
 
 export default function FollowsTab() {
