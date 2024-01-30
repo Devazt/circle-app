@@ -5,6 +5,8 @@ import { AppDataSource } from "./data-source";
 import dotenv from "dotenv";
 import router from "./routes";
 import { redisConnect } from "./utils/caching-redis/redis";
+import swaggerUI from "swagger-ui-express";
+import apidocs from "./apidocs.json";
 
 dotenv.config();
 
@@ -30,6 +32,7 @@ AppDataSource.initialize()
         app.use(express.json());
         app.use(cors(corsOptions));
         app.use("/api/v1", router);
+        app.use("/api/v1/api-docs", swaggerUI.serve, swaggerUI.setup(apidocs));
 
         app.listen(port, () => {
             console.log(`⚡️[server]: Server is running at http://localhost:${port}`);

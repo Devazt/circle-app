@@ -1,0 +1,1111 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Circle API Documentation",
+    "description": "OpenAPI which contains complete documentation about all endpoints that can be used in this RESTful API.",
+    "contact": {
+      "name": "Arre Pangestu",
+      "url": "https://www.instagram.com/itscheattos/",
+      "email": "arre@gmail.com"
+    },
+    "license": {
+      "name": "MIT License",
+      "url": "https://opensource.org/license/mit"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/api/circle",
+      "description": "Development API Circle"
+    }
+  ],
+  "paths": {
+    "/register": {
+      "post": {
+        "summary": "Register",
+        "tags": [
+          "Auth"
+        ],
+        "description": "This endpoint is used to register new user.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fullName": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              },
+              "examples": {
+                "User 1": {
+                  "description": "Register Request Body Example 1",
+                  "value": {
+                    "fullName": "Arre Pangestu",
+                    "email": "arre@gmail.com",
+                    "password": "arre007A*"
+                  }
+                },
+                "User 2": {
+                  "description": "Register Request Body Example 2",
+                  "value": {
+                    "fullName": "Prabowo Subianto",
+                    "email": "prasub@gmail.com",
+                    "password": "presidenRI#1"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Register Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                },
+                "example": {
+                  "code": 201,
+                  "status": "success",
+                  "message": "Register Success"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 400,
+                  "status": "failed",
+                  "message": "Validation Failed",
+                  "error": "\"fullName\" is required"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Regster Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 401,
+                  "status": "failed",
+                  "message": "Register Failed",
+                  "error": "Email arre@gmail.com already registered"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Regster Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 409,
+                  "status": "failed",
+                  "message": "Register Failed",
+                  "error": "Password must be at least 8 characters, uniqe combination of letters, symbols and numbers"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 500,
+                  "status": "failed",
+                  "message": "Internal Server Error",
+                  "error": "An unknown error occurred"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "summary": "Login",
+        "tags": [
+          "Auth"
+        ],
+        "description": "This endpoint is used to get jwt token for login.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "emailOrUsername": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              },
+              "examples": {
+                "User 1": {
+                  "description": "Login Request Body Example 1",
+                  "value": {
+                    "emailOrUsername": "arre@gmail.com",
+                    "password": "arre007A*"
+                  }
+                },
+                "User 2": {
+                  "description": "Login Request Body Example 2",
+                  "value": {
+                    "emailOrUsername": "prasub@gmail.com",
+                    "password": "presidenRI#1"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessWithToken"
+                },
+                "example": {
+                  "code": 201,
+                  "status": "success",
+                  "message": "Register Success"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 400,
+                  "status": "failed",
+                  "message": "Validation Failed",
+                  "error": "\"emailOrUsername\" is required"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Validation Failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 404,
+                  "status": "failed",
+                  "message": "Validation Failed",
+                  "error": "\"emailOrUsername\" not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 500,
+                  "status": "failed",
+                  "message": "Internal Server Error",
+                  "error": "An unknown error occurred"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/check": {
+      "get": {
+        "summary": "Check Token",
+        "tags": [
+          "Auth"
+        ],
+        "description": "This endpoint is used to check whether the jwt token is still valid or not.",
+        "responses": {
+          "200": {
+            "description": "Token Is Valid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                },
+                "example": {
+                  "code": 200,
+                  "status": "success",
+                  "message": "Token Is Valid"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 401,
+                  "status": "failed",
+                  "message": "Access Unauthorized",
+                  "error": "JWT Token Invalid"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 500,
+                  "status": "failed",
+                  "message": "Internal Server Error",
+                  "error": "An unknown error occurred"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/users": {
+      "get": {
+        "summary": "Find All User",
+        "tags": [
+          "User"
+        ],
+        "description": "This endpoint is used to get all user data.",
+        "responses": {
+          "200": {
+            "description": "Find All User Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "username": {
+                            "type": "string"
+                          },
+                          "fullname": {
+                            "type": "string"
+                          },
+                          "email": {
+                            "type": "string"
+                          },
+                          "password": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "profile_picture": {
+                            "type": "string"
+                          },
+                          "bio": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "totalPage": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "example": {
+                  "code": 200,
+                  "status": "success",
+                  "message": "Find All User Success",
+                  "data": [
+                    {
+                      "id": "ae725814-7978-4f51-a2c6-0b6b14e1c7ae",
+                      "username": "user_ae725814_19362",
+                      "fullname": "Arre Pangestu",
+                      "email": "arre@gmail.com",
+                      "password": null,
+                      "profile_picture": "https://res.cloudinary.com/dogz0yvva/image/upload/v1698908295/nibiru-cloud-storage/qzgmgjmxwxbzvvzspwbz.png",
+                      "bio": null,
+                      "created_at": "2023-12-29 14:29:49.415256",
+                      "updated_at": "2023-12-29 14:29:49.415256"
+                    },
+                    {
+                      "id": "bfb6d4a8-be21-40b3-a27e-54df6ca309b0",
+                      "username": "user_bfb6d4a8_1203",
+                      "fullname": "Prabowo Subianto",
+                      "email": "prasub@gmail.com",
+                      "password": null,
+                      "profile_picture": "https://res.cloudinary.com/dogz0yvva/image/upload/v1698908295/nibiru-cloud-storage/qzgmgjmxwxbzvvzspwbz.png",
+                      "bio": null,
+                      "created_at": "2023-12-29 14:29:15.454142",
+                      "updated_at": "2023-12-29 14:29:15.454142"
+                    }
+                  ],
+                  "totalPage": 1
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 401,
+                  "status": "failed",
+                  "message": "Access Unauthorized",
+                  "error": "JWT Token Invalid"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 500,
+                  "status": "failed",
+                  "message": "Internal Server Error",
+                  "error": "An unknown error occurred"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/user/profile": {
+      "put": {
+        "summary": "User Update",
+        "tags": [
+          "User"
+        ],
+        "description": "This endpoint is used to update user data.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fullName": {
+                    "type": "string"
+                  },
+                  "bio": {
+                    "type": "string"
+                  },
+                  "userName": {
+                    "type": "string"
+                  },
+                  "profilePicture": {
+                    "type": "string"
+                  }
+                }
+              },
+              "examples": {
+                "User 1": {
+                  "description": "Update Request Body Example 1",
+                  "value": {
+                    "fullName": "Arre Pangestu",
+                    "bio": "aku adalah mahasiswa",
+                    "userName": "arredev",
+                    "profilePicture": "https://res.cloudinary.com/di4ysnubj/image/upload/v1703836071/circle/orv1xoqeeulyo9qccl2w.jpg"
+                  }
+                },
+                "User 2": {
+                  "description": "Update Request Body Example 2",
+                  "value": {
+                    "fullName": "Prabowo Subianto",
+                    "bio": "aku adalah Presiden Rakyat Indonesia",
+                    "userName": "presidenri1",
+                    "profilePicture": "https://res.cloudinary.com/di4ysnubj/image/upload/v1703836071/circle/orv1xoqeeulyo9qccl2w.jpg"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Update Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                },
+                "example": {
+                  "code": 200,
+                  "status": "success",
+                  "message": "Profile Update Success"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 401,
+                  "status": "failed",
+                  "message": "Access Unauthorized",
+                  "error": "JWT Token Invalid"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 500,
+                  "status": "failed",
+                  "message": "Internal Server Error",
+                  "error": "An unknown error occurred"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/user": {
+      "delete": {
+        "summary": "User Delete",
+        "tags": [
+          "User"
+        ],
+        "description": "This endpoint is used to delete user data.",
+        "responses": {
+          "200": {
+            "description": "Delete Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                },
+                "example": {
+                  "code": 200,
+                  "status": "success",
+                  "message": "Remove Account Success"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 401,
+                  "status": "failed",
+                  "message": "Access Unauthorized",
+                  "error": "JWT Token Invalid"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 500,
+                  "status": "failed",
+                  "message": "Internal Server Error",
+                  "error": "An unknown error occurred"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/threads": {
+      "get": {
+        "summary": "Find All Threads",
+        "tags": [
+          "Threads"
+        ],
+        "description": "This endpoint is used to get all thread data.",
+        "responses": {
+          "200": {
+            "description": "Find All thread Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "content": {
+                            "type": "string"
+                          },
+                          "image": {
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "type": "string"
+                          },
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "code": 200,
+                  "status": "success",
+                  "message": "Find All Threads Success",
+                  "data": [
+                    {
+                      "id": "3612326d-e117-49f7-b74c-c0815dcbdc85",
+                      "content": "Ini adalah content untuk user Arre Pangestu",
+                      "image": "https://res.cloudinary.com/di4ysnubj/image/upload/v1703836123/circle/pa75dkylihmvmpiedu9q.jpg",
+                      "user_id": "ae725814-7978-4f51-a2c6-0b6b14e1c7ae",
+                      "created_at": "2023-12-29 14:40:51.034283",
+                      "updated_at": "2023-12-29 14:40:51.034283"
+                    },
+                    {
+                      "id": "3612326d-e117-49f7-b74c-c0815dcbdc85",
+                      "content": "Ini adalah content untuk user Prabowo Subianto",
+                      "image": "https://res.cloudinary.com/di4ysnubj/image/upload/v1703835564/circle/qgs2tgjua3pirvpgkzxi.jpg",
+                      "user_id": "bfb6d4a8-be21-40b3-a27e-54df6ca309b0",
+                      "created_at": "2023-12-29 14:40:51.034283",
+                      "updated_at": "2023-12-29 14:40:51.034283"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 401,
+                  "status": "failed",
+                  "message": "Access Unauthorized",
+                  "error": "JWT Token Invalid"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 500,
+                  "status": "failed",
+                  "message": "Internal Server Error",
+                  "error": "An unknown error occurred"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/thread": {
+      "post": {
+        "summary": "Post New Thread",
+        "tags": [
+          "Threads"
+        ],
+        "description": "This endpoint is used to post new thread.",
+        "responses": {
+          "200": {
+            "description": "Post thread Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "content": {
+                            "type": "string"
+                          },
+                          "image": {
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "type": "string"
+                          },
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "code": 200,
+                  "status": "success",
+                  "message": "Post Thread Success",
+                  "data": [
+                    {
+                      "id": "4c41af97-0f8a-4dcb-ae49-3fb5ac3e55db",
+                      "content": "Post baru Thread untuk user Arre Pangestu",
+                      "image": "https://res.cloudinary.com/di4ysnubj/image/upload/v1703836123/circle/pa75dkylihmvmpiedu9q.jpg",
+                      "user_id": "ae725814-7978-4f51-a2c6-0b6b14e1c7ae",
+                      "created_at": "2024-01-01 00:00:01.046273",
+                      "updated_at": "2024-01-01 00:00:01.046273"
+                    },
+                    {
+                      "id": "3a060599-45db-44c0-9079-d9c1b3f49634",
+                      "content": "PPPP new Prabowo",
+                      "image": "https://res.cloudinary.com/di4ysnubj/image/upload/v1703835564/circle/qgs2tgjua3pirvpgkzxi.jpg",
+                      "user_id": "bfb6d4a8-be21-40b3-a27e-54df6ca309b0",
+                      "created_at": "2024-01-01 00:00:10.046273",
+                      "updated_at": "2024-01-01 00:00:10.046273"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 401,
+                  "status": "failed",
+                  "message": "Access Unauthorized",
+                  "error": "JWT Token Invalid"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 500,
+                  "status": "failed",
+                  "message": "Internal Server Error",
+                  "error": "An unknown error occurred"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/thread/:threadId": {
+      "put": {
+        "summary": "Update Thread",
+        "tags": [
+          "Threads"
+        ],
+        "description": "This endpoint is used to update thread.",
+        "responses": {
+          "200": {
+            "description": "Post thread Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "content": {
+                            "type": "string"
+                          },
+                          "image": {
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "type": "string"
+                          },
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "code": 200,
+                  "status": "success",
+                  "message": "Post Thread Success",
+                  "data": [
+                    {
+                      "id": "4c41af97-0f8a-4dcb-ae49-3fb5ac3e55db",
+                      "content": "[Update] Thread untuk user Arre Pangestu",
+                      "image": "https://res.cloudinary.com/di4ysnubj/image/upload/v1703836123/circle/pa75dkylihmvmpiedu9q.jpg",
+                      "user_id": "ae725814-7978-4f51-a2c6-0b6b14e1c7ae",
+                      "created_at": "2024-01-01 00:00:21.046273",
+                      "updated_at": "2024-01-01 00:00:21.046273"
+                    },
+                    {
+                      "id": "3a060599-45db-44c0-9079-d9c1b3f49634",
+                      "content": "[Update] Thread untuk user Prabowo Subianto",
+                      "image": "https://res.cloudinary.com/di4ysnubj/image/upload/v1703835564/circle/qgs2tgjua3pirvpgkzxi.jpg",
+                      "user_id": "bfb6d4a8-be21-40b3-a27e-54df6ca309b0",
+                      "created_at": "2024-01-01 00:00:56.046273",
+                      "updated_at": "2024-01-01 00:00:56.046273"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 401,
+                  "status": "failed",
+                  "message": "Access Unauthorized",
+                  "error": "JWT Token Invalid"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 500,
+                  "status": "failed",
+                  "message": "Internal Server Error",
+                  "error": "An unknown error occurred"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    },
+    "/threadh/:threadId": {
+      "delete": {
+        "summary": "Delete Thread",
+        "tags": [
+          "Threads"
+        ],
+        "description": "This endpoint is used to delete thread.",
+        "responses": {
+          "200": {
+            "description": "Success Delete Thread",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 200,
+                  "status": "success",
+                  "message": "Delete One Thread Success"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 401,
+                  "status": "failed",
+                  "message": "Access Unauthorized",
+                  "error": "JWT Token Invalid"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Failure"
+                },
+                "example": {
+                  "code": 500,
+                  "status": "failed",
+                  "message": "Internal Server Error",
+                  "error": "An unknown error occurred"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Token": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Success": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "SuccessWithToken": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "Failure": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer Token": {
+        "description": "Token To Authorized Private Endpoint",
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
