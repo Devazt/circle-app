@@ -33,14 +33,14 @@ export default function SideProfile() {
         <CardBody>
           <Box
             w={"full"}
-            h={"80px"}
+            h={"120px"}
             bgGradient={"linear(to-r, green.400, green.600)"}
             borderRadius={"10"}
             position={"relative"}
           >
             <Image
               src={profile.photo_profile}
-              boxSize={"70px"}
+              boxSize={"90px"}
               rounded={"full"}
               borderWidth={4}
               borderColor={"gray.200"}

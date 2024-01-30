@@ -11,6 +11,7 @@ export function useProfileCard() {
     queryKey: ["profile-card"],
     queryFn: async () => {
       const res = await API.get("/user");
+      console.log(res.data.data);
       return res.data.data;
     },
   });

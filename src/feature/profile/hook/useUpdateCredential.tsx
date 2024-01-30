@@ -15,7 +15,7 @@ export default function useUpdateCredential() {
             return await API.patch("/userpw", form);
         },
         onSuccess: () => {
-            toast("Success", "Profile Updated", "success");
+            toast("Success", "Password Updated", "success");
             queryClient.invalidateQueries({ queryKey: ["following"] });
         },
         onError: (err) => {

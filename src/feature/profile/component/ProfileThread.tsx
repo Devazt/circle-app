@@ -18,10 +18,13 @@ export default function ProfileThread({ id, content, image, created_at }: any) {
       <Box px="1rem">
         <Link to={`/thread/${id}`}>
           <Box>
-            <Text fontSize="2xs" color="gray.400">
+            <Text fontSize="md" color="gray.400" fontWeight={"bold"} textDecoration={"underline"}>
               {created_at}
             </Text>
           </Box>
+          <Box my="2">
+              <Text fontSize="lg">{content}</Text>
+            </Box>
           <Box ms="3rem">
             {image && (
               <Box mt="0.5rem">
@@ -34,9 +37,6 @@ export default function ProfileThread({ id, content, image, created_at }: any) {
                 />
               </Box>
             )}
-            <Box my="2">
-              <Text fontSize="0.86rem">{content}</Text>
-            </Box>
           </Box>
         </Link>
       </Box>

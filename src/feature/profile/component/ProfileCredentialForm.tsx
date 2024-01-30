@@ -1,22 +1,46 @@
-import { useForm } from "react-hook-form"
-import FormRow from "@/components/FormRow"
-import { Box, Button, Input, Stack } from "@chakra-ui/react"
-import useUpdateCredential from "../hook/useUpdateCredential"
+import { useForm } from "react-hook-form";
+import FormRow from "@/components/FormRow";
+import { Box, Button, Flex, Input, Stack } from "@chakra-ui/react";
+import useUpdateCredential from "../hook/useUpdateCredential";
+import FormProfile from "./FormProfile";
+import { useProfileCard } from "../hook/useProfileCard";
+import Spinner from "@/components/Spinner";
 
 export default function ProfileCredentialForm() {
-    const { register, handleSubmit, formState, getValues, reset } = useForm()
-    const { errors } = formState;
+  const { register, handleSubmit, formState, getValues, reset } = useForm();
+  const { errors } = formState;
 
-    const { form, setForm, updateUser, isUpdating } = useUpdateCredential();
+  const { form, setForm, updateUser, isUpdating } = useUpdateCredential();
 
-    function onSubmit({ password }: any) {
-      setForm({ ...form, password })
-      updateUser()
-    }
+  function onSubmit({ password }: any) {
+    setForm({ ...form, password });
+    updateUser();
+  }
 
-    return (
-        <Stack w={"full"} alignItems={"center"}>
-        <Box w="540px" display={"flex"} flexDirection="column" bgColor="gray.700" rounded="xl" px="5" py="9">
+  const { profile, isLoading } = useProfileCard();
+  if (isLoading) return <Spinner />;
+
+  return (
+    <Stack w={"full"} alignItems={"center"}>
+      <Flex direction={"column"} gap={4}>
+        <Box p={4} borderBottom={"1px"} borderColor={"gray.500"}>
+          <FormProfile
+            photo_profile={profile.photo_profile}
+            username={profile.username}
+            fullname={profile.fullname}
+            bio={profile.bio}
+          />
+        </Box>
+      </Flex>
+      <Box
+        w={"400px"}
+        display={"flex"}
+        flexDirection="column"
+        bgColor="gray.700"
+        rounded="xl"
+        px="5"
+        py="9"
+      >
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormRow
             label="New password (min 8 chars)"
@@ -35,7 +59,10 @@ export default function ProfileCredentialForm() {
               })}
             />
           </FormRow>
-          <FormRow label="Confirm new password" error={errors?.passwordConfirm?.message?.toString()}>
+          <FormRow
+            label="Confirm new password"
+            error={errors?.passwordConfirm?.message?.toString()}
+          >
             <Input
               type="password"
               id="passwordConfirm"
@@ -62,6 +89,6 @@ export default function ProfileCredentialForm() {
           </Box>
         </form>
       </Box>
-      </Stack>
-    )
+    </Stack>
+  );
 }
